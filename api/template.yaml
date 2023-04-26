@@ -20,10 +20,7 @@ Resources:
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
           SAMPLE_TABLE: !Ref SampleTable
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref SampleTable
+          MementoOrganizerMongoConnectionStr: !Ref MementoOrganizerMongoProductionConnectionStr
       Events:
         ProxyResource:
           Type: HttpApi
@@ -37,18 +34,6 @@ Resources:
           Properties:
             Path: /
             Method: ANY
-
-  # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
-  SampleTable:
-    Type: AWS::Serverless::SimpleTable
-    Properties:
-      TableName: MementoOrganizerBookCatalog
-      PrimaryKey:
-        Name: Id
-        Type: String
-      ProvisionedThroughput:
-        ReadCapacityUnits: 2
-        WriteCapacityUnits: 2
 
 Outputs:
   WebEndpoint:
