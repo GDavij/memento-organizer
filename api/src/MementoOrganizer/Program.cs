@@ -1,6 +1,9 @@
 using System.Text.Json;
 using Amazon;
-
+using System;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
