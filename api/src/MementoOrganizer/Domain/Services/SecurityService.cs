@@ -108,7 +108,7 @@ public class SecurityService : ISecurityService
         return token;
     }
 
-    public bool TryParseToken<TId>(string? token, IIdentityProvider<TId> identityProvider, out Token<TId>? authenticatedToken)
+    public Token<TId>? TryParseToken<TId>(string? token, IIdentityProvider<TId> identityProvider)
     {
         try
         {
@@ -118,26 +118,23 @@ public class SecurityService : ISecurityService
 
             if (!payload.ContainsKey("exp") || !payload.ContainsKey("id") || !payload.ContainsKey("passphrase"))
             {
-                authenticatedToken = null;
-                return false;
+                return null;
             }
 
             long timeLimit = long.Parse(payload["exp"]);
             if (DateTime.UtcNow.Ticks - timeLimit >= 0.0)
             {
-                authenticatedToken = null;
-                return false;
+                return null;
             }
 
             TId id = identityProvider.ParseIdFromString(payload["id"]);
-            authenticatedToken = new Token<TId>(id, payload["passphrase"]);
-            return true;
+            return new Token<TId>(id, payload["passphrase"]);
+
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);// Probaly Remove This or use an ILogger for logging
-            authenticatedToken = null;
-            return false;
+            Console.WriteLine(e);// Probaly Remove This or use an ILogger instance for logging
+            return null;
         }
     }
 }

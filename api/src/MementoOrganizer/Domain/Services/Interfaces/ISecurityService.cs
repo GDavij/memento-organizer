@@ -13,5 +13,6 @@ public interface ISecurityService
     Task<string> DechipherData(string encriptedData, string key, string iv);
     string DerivePassphrase(string passphrase, string salt);
     string GenerateToken<TId>(TId id, string passphrase);
-    bool TryParseToken<TId>(string? token, IIdentityProvider<TId> identityProvider, out Token<TId>? authenticatedToken);
+    Token<TId>? TryParseToken<TId>(string? token, IIdentityProvider<TId> identityProvider);
+
 }
