@@ -13,7 +13,7 @@ public class MongoUsersRepository : IUsersRepository<ObjectId>
     public MongoUsersRepository(IDatabaseConnection<IMongoDatabase> databaseConnection)
     {
         var database = databaseConnection.Resolve();
-        _usersCollection = database.GetCollection<User<ObjectId>>("users");
+        _usersCollection = database.GetCollection<User<ObjectId>>("users", new MongoCollectionSettings { AssignIdOnInsert = false });
     }
 
     public async Task<bool> DeleteUserById(ObjectId id)

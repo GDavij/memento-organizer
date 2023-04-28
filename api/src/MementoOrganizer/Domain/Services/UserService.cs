@@ -50,7 +50,7 @@ public class UserService : IUserService
         }
 
         DateTime issued = DateTime.UtcNow;
-        string derivedPassphrase = _securityService.DerivePassphrase(createAdminRequest.Passphrase!, issued.Ticks.ToString());
+        string derivedPassphrase = _securityService.DerivePassphrase(createAdminRequest.Passphrase!, issued.ToString());
 
         User<ObjectId> newUser = new User<ObjectId>(
             _mongoIdentityProvider,
@@ -72,7 +72,7 @@ public class UserService : IUserService
 
         DateTime issued = DateTime.UtcNow;
         string derivedPassphrase = _securityService
-                    .DerivePassphrase(createUserRequest.Passphrase!, issued.Ticks.ToString());
+                    .DerivePassphrase(createUserRequest.Passphrase!, issued.ToString());
 
         User<ObjectId> user = new User<ObjectId>(
             _mongoIdentityProvider,
@@ -111,7 +111,7 @@ public class UserService : IUserService
             throw new Exception("User Not Found");
         }
 
-        string derivedPassphrase = _securityService.DerivePassphrase(loginUserRequest.Passphrase!, databaseUser.Issued.Ticks.ToString());
+        string derivedPassphrase = _securityService.DerivePassphrase(loginUserRequest.Passphrase!, databaseUser.Issued.ToString());
         if (!databaseUser.Passphrase.Equals(derivedPassphrase))
         {
             throw new Exception("User Could not be Authenticated");
