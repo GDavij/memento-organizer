@@ -4,6 +4,8 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using MementoOrganizer.Application.Middlewares;
+using MementoOrganizer.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,16 @@ builder.Services
             options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         });
 
+// Add Infrastructure Services
+builder.Services.SetupInfrastructure();
+
+// Add Domain Services
+builder.Services.SetupDomain();
+
+// Add Application Rules (Validation, Middlewares, etc...)
+builder.Services.SetupApplicationRules();
+
+
 string region = Environment.GetEnvironmentVariable("AWS_REGION") ?? RegionEndpoint.USEast2.SystemName;
 
 // Add AWS Lambda support. When running the application as an AWS Serverless application, Kestrel is replaced
@@ -31,6 +43,7 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+app.UseMiddleware<GlobalErrorHandlingMiddleware>();
 app.MapControllers();
 
 app.MapGet("/", () => "Welcome to running ASP.NET Core Minimal API on AWS Lambda");

@@ -9,6 +9,7 @@ using MementoOrganizer.Domain.Providers;
 using MementoOrganizer.Infrastructure.Providers;
 using MementoOrganizer.Domain.Services.Interfaces;
 using MementoOrganizer.Domain.Services;
+using MementoOrganizer.Application.Middlewares;
 using MementoOrganizer.Application.Validators.Requests.Users;
 using MementoOrganizer.Domain.Models.Requests.Users;
 using FluentValidation;
@@ -41,6 +42,7 @@ public static class SetupApplicationExtensionMethod
     public static IServiceCollection SetupApplicationRules(this IServiceCollection services)
     {
         services
+            .AddScoped<GlobalErrorHandlingMiddleware>()
             .AddScoped<IValidator<CreateAdminRequest>, CreateAdminRequestValidator>()
             .AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValidator>()
             .AddScoped<IValidator<LoginUserRequest>, LoginUserRequestValidator>()
