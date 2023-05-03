@@ -11,7 +11,9 @@ using MementoOrganizer.Domain.Services.Interfaces;
 using MementoOrganizer.Domain.Services;
 using MementoOrganizer.Application.Middlewares;
 using MementoOrganizer.Application.Validators.Requests.Users;
+using MementoOrganizer.Application.Validators.Requests.Notes;
 using MementoOrganizer.Domain.Models.Requests.Users;
+using MementoOrganizer.Domain.Models.Requests.Notes;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
@@ -25,6 +27,7 @@ public static class SetupApplicationExtensionMethod
         services
             .AddScoped<IDatabaseConnection<IMongoDatabase>, MongoDatabaseConnection>()
             .AddScoped<IUsersRepository<ObjectId>, MongoUsersRepository>()
+            .AddScoped<INotesRepository<ObjectId>, MongoNotesRepository>()
             .AddSingleton<IIdentityProvider<ObjectId>, MongoIdentityProvider>();
 
         return services;
@@ -34,7 +37,8 @@ public static class SetupApplicationExtensionMethod
     {
         services
             .AddScoped<ISecurityService, SecurityService>()
-            .AddScoped<IUserService, UserService>();
+            .AddScoped<IUserService, UserService>()
+            .AddScoped<INoteService, NoteService>();
 
         return services;
     }
@@ -46,6 +50,7 @@ public static class SetupApplicationExtensionMethod
             .AddScoped<IValidator<CreateAdminRequest>, CreateAdminRequestValidator>()
             .AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValidator>()
             .AddScoped<IValidator<LoginUserRequest>, LoginUserRequestValidator>()
+            .AddScoped<IValidator<CreateNoteRequest>, CreateNoteRequestValidator>()
             .AddFluentValidationAutoValidation();
 
         return services;
