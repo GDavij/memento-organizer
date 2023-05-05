@@ -1,7 +1,7 @@
 using System;
 namespace MementoOrganizer.Domain.Models.Responses.Notes;
 
-public class NoteResponse
+public record NoteResponse
 {
     public string Id { get; init; }
     public string Owner { get; init; }
