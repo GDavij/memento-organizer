@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {
+  env: {
+    API_URL: process.env["mementoOrganizerApiUrl"],
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
