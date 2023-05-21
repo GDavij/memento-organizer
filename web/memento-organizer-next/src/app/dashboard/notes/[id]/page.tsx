@@ -15,7 +15,6 @@ import notesService from "@/services/notes.service";
 import { useForm } from "react-hook-form";
 import { usePathname } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.min.css";
 import Loader from "@/app/components/Loader";
 
 export default function Notes() {
