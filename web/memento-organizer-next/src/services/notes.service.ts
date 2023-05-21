@@ -7,8 +7,8 @@ import {
 
 //? Maybe Create Request Validators inside these services
 
-async function createNote(request: TCreateNoteRequest) {
-  return await axios.post("/notes/new", request);
+async function createNote(request: TCreateNoteRequest): Promise<string> {
+  return (await axios.post<{ id: string }>("/notes/new", request)).data.id;
 }
 
 async function getNotesByOwner(): Promise<Note[]> {

@@ -1,5 +1,4 @@
 "use client";
-
 import {
   MdAssignment,
   MdAssignmentAdd,
@@ -9,14 +8,13 @@ import {
   MdOutlineSquare,
 } from "react-icons/md";
 import { Note } from "@/models/data/note";
-import { Ref, useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import notesService from "@/services/notes.service";
 import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.min.css";
 import Loader from "@/app/components/Loader";
 import { useForm } from "react-hook-form";
-
+import CreateNoteModal from "./components/CreateNoteModal";
 export default function Notes() {
   type TFilterOptions =
     | "Id"
@@ -34,11 +32,10 @@ export default function Notes() {
   const { watch, register } = useForm<{
     filterType: TFilterOptions;
     filterData: string;
-  }>({ defaultValues: { filterData: "", filterType: "Id" } });
+  }>({ defaultValues: { filterData: "", filterType: "Name" } });
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
-  const [openCreateNoteModal, setOpenCreateModal] = useState(false);
   const [isFetchingNotes, setIsFetchingNotes] = useState(true);
 
   function filterSearch(item: Note, index: number): boolean {
@@ -86,12 +83,12 @@ export default function Notes() {
   }, []);
 
   const filterId = useId();
-
+  const [CreateNoteModalOpen, setCreateNoteModalOpen] = useState(false);
   return (
     <>
       <div className="sm:ml-0 ml-5 w-11/12  bg-white dark:bg-slate-700 sticky top-0 px-2 py-4 sm:p-4 flex flex-row-reverse items-center mb-8 drop-shadow-lg z-10 gap-4">
         <button
-          onClick={() => setOpenCreateModal((prev) => !prev)}
+          onClick={() => setCreateNoteModalOpen(true)}
           className=" sm:w-64 w-44 p-2 sm:p-4  text-sm sm:text-md bg-emerald-500 rounded-lg  text-white font-bold hover:bg-emerald-600 transition-colors flex gap-2"
         >
           Create New Note <MdAssignmentAdd className="inline text-lg" />
@@ -151,12 +148,12 @@ export default function Notes() {
             >
               <Link
                 className="w-full h-full flex flex-col gap-8"
-                href={"/dashboard/notes/" + note.id}
+                href={`/dashboard/notes/${note.id}`}
               >
                 <div className="border-l-2 border-emerald-500 pl-2">
                   <div className="flex justify-between items-center">
                     <MdAssignment className="inline text-xl" />
-                    <span className="text-2xl w-5/6 md:w-4/6 font-bold flex flex-grow-0 flex-shrink justify-between items-center">
+                    <span className="text-lg md:text-2xl w-3/6 md:w-4/6 font-bold flex flex-grow-0 flex-shrink justify-between items-center">
                       <span className="inline-block max-w-full truncate ">
                         {note.name}
                       </span>
@@ -187,6 +184,12 @@ export default function Notes() {
         )}
       </div>
       <ToastContainer />
+      <CreateNoteModal
+        open={CreateNoteModalOpen}
+        onClose={() => {
+          setCreateNoteModalOpen(false);
+        }}
+      />
     </>
   );
 }
