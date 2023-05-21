@@ -21,8 +21,8 @@ public class NotesController : ControllerBase
     [Route("new")]
     public async Task<IActionResult> CreateNewNote([FromHeader()] string authorization, [FromBody()] CreateNoteRequest createNoteRequest)
     {
-        await _noteService.CreateNote(authorization, createNoteRequest);
-        return Ok();
+        string noteId = await _noteService.CreateNote(authorization, createNoteRequest);
+        return Ok(new { id = noteId });
     }
 
     [HttpGet]
