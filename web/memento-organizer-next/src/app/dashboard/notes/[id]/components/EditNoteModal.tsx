@@ -70,8 +70,8 @@ export default function CreateNoteModal({
     await notesService.updateNote(id, filteredBody);
     await refetchNoteCb();
     toast.success("Alteration has been saved");
-    setIsSaving(false);
     onClose();
+    setIsSaving(false);
   }
   return (
     <>
@@ -86,8 +86,9 @@ export default function CreateNoteModal({
         optionsMenu={
           <span>
             <button
+              disabled={isSaving}
               onClick={() => setOpenDeleteDialog(true)}
-              className="flex gap-2 items-center justify-center bg-red-500 hover:bg-red-700 text-white transition-colors p-2 rounded-md text-lg"
+              className="flex gap-2 items-center justify-center bg-red-500 disabled:bg-slate-800 disabled:text-red-500  hover:bg-red-700 text-white transition-colors p-2 rounded-md text-lg"
             >
               <MdDelete className="inline-block" />
               Delete Note
@@ -104,6 +105,7 @@ export default function CreateNoteModal({
             <label className="w-full">
               Note Name*
               <input
+                readOnly={isSaving}
                 {...register("name", { required: true, minLength: 4 })}
                 type="text"
                 className="w-full h-8 bg-slate-300 dark:bg-slate-800 outline-none p-6 text-base rounded-md"
@@ -120,6 +122,7 @@ export default function CreateNoteModal({
             <label className="w-full">
               Description*
               <input
+                readOnly={isSaving}
                 {...register("description", { required: true, minLength: 8 })}
                 type="text"
                 className="w-full h-8 bg-slate-300 dark:bg-slate-800 outline-none p-6 text-base rounded-md"
@@ -133,7 +136,10 @@ export default function CreateNoteModal({
                 </div>
               )}
             </label>
-            <button className=" w-full p-4 bg-emerald-500 text-white rounded-2xl shadow-black drop-shadow-sm hover:bg-slate-300 hover:text-emerald-600 transition-all hover:drop-shadow-none dark:hover:bg-slate-600 text-lg flex items-center justify-center h-16 disabled:cursor-not-allowed">
+            <button
+              disabled={isSaving}
+              className=" w-full p-4 bg-emerald-500 disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-emerald-500 text-white rounded-2xl shadow-black drop-shadow-sm hover:bg-slate-300 hover:text-emerald-600 transition-all hover:drop-shadow-none dark:hover:bg-slate-600 text-lg flex items-center justify-center h-16 disabled:cursor-not-allowed"
+            >
               {isSaving ? (
                 <Loader loadingText="Saving Note" size="text-lg" />
               ) : (
