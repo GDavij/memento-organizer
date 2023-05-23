@@ -140,7 +140,7 @@ export default function Notes() {
       <div className="sm:ml-0 ml-5 w-11/12 h-fit bg-white dark:bg-slate-700 flex gap-4 flex-wrap flex-grow p-4 justify-center drop-shadow-lg">
         {isFetchingNotes ? (
           <Loader loadingText="Fetching notes" />
-        ) : (
+        ) : filteredNotes.length > 0 ? (
           filteredNotes.map((note) => (
             <div
               key={note.id}
@@ -181,6 +181,17 @@ export default function Notes() {
               </Link>
             </div>
           ))
+        ) : (
+          <section className="w-full h-full flex flex-col gap-2 items-center justify-center">
+            <h1 className=" text-lg md:text-4xl">
+              You Don&apos;t have any Notes Yet
+            </h1>
+            <article className=" text-sm md:text-lg  font-light text-slate-500 dark:text-gray-100">
+              Create your first note by clicking in the &quot;Create New Note{" "}
+              <MdAssignmentAdd className="inline text-lg" />
+              &quot; Button
+            </article>
+          </section>
         )}
       </div>
       <ToastContainer />
