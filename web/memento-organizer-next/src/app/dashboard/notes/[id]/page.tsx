@@ -7,8 +7,10 @@ import {
   MdAutorenew,
   MdBuild,
   MdOutlineSquare,
+  MdSettings,
   MdVisibility,
 } from "react-icons/md";
+import EditNoteModal from "./components/EditNoteModal";
 import { Note } from "@/models/data/note";
 import { LegacyRef, Ref, useEffect, useId, useRef, useState } from "react";
 import notesService from "@/services/notes.service";
@@ -26,6 +28,7 @@ export default function Notes() {
   const [isFetchingNote, setIsFetchingNote] = useState(true);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [isSavingNote, setIsSavingNote] = useState(false);
+  const [isEditingNote, setIsEditingNote] = useState(false);
 
   function togglePreview() {
     if (!isPreviewing) {
@@ -66,7 +69,7 @@ export default function Notes() {
 
   return (
     <>
-      <div className="sm:ml-0 ml-5 w-11/12  bg-white dark:bg-slate-700 sticky top-0 px-2 py-4 sm:p-4 flex flex-row justify-between mb-8 drop-shadow-lg z-10 gap-4">
+      <div className="sm:ml-0 ml-5 w-11/12 md:flex-nowrap flex-wrap bg-white dark:bg-slate-700 sticky top-0 px-2 py-4 sm:p-4 flex flex-row items-center justify-between mb-8 drop-shadow-lg z-10 gap-4">
         <button
           onClick={togglePreview}
           className="p-2 bg-emerald-600 hover:bg-emerald-700 transition-colors rounded-lg flex gap-2 items-center w-28 justify-center sm:w-72 text-white flex-grow-0 flex-shrink-0"
@@ -84,6 +87,12 @@ export default function Notes() {
         <span className="flex-grow-0 flex-shrink inline-block max-w-full truncate text-ellipsis sm:text-2xl text-sm">
           {note?.name}
         </span>
+        <button
+          onClick={() => setIsEditingNote(true)}
+          className="p-2 bg-emerald-600 hover:bg-emerald-700 transition-colors rounded-lg text-white flex items-center w-fit justify-center  flex-grow-0 flex-shrink-0"
+        >
+          <MdSettings className="inline text-xl" />
+        </button>
         <button
           disabled={isSavingNote || isFetchingNote}
           onClick={saveNote}
@@ -175,6 +184,12 @@ export default function Notes() {
           ></textarea>
         )}
       </div>
+      <EditNoteModal
+        refetchNoteCb={fetchNote}
+        open={note != null && isEditingNote}
+        onClose={() => setIsEditingNote(false)}
+        id={noteId}
+      />
       <ToastContainer />
     </>
   );

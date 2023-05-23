@@ -26,11 +26,16 @@ async function updateNote(
   return (await axios.put(`/notes/update/${id}`, updateRequest)).data;
 }
 
+async function deleteNote(id: string): Promise<boolean> {
+  return (await axios.delete(`/notes/delete/${id}`)).data;
+}
+
 const service = {
   createNote,
   getNotesByOwner,
   getNote,
   updateNote,
+  deleteNote,
 };
 
 export default service;
