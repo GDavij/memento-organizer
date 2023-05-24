@@ -8,7 +8,7 @@ using MementoOrganizer.Domain.Models.Responses.Notes;
 namespace MementoOrganizer.Domain.Services.Interfaces;
 public interface INoteService
 {
-    Task CreateNote(string token, CreateNoteRequest createNoteRequest);
+    Task<string> CreateNote(string token, CreateNoteRequest createNoteRequest);
     Task<List<NoteResponse>> GetNotes(string token);
     Task<NoteResponse> GetNote(string token, string noteId);
     Task<bool> UpdateNote(string token, string noteId, UpdateNoteRequest updateNoteRequest);

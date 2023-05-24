@@ -32,7 +32,7 @@ public class NoteService : INoteService
         _mongoUsersRepository = mongoUsersRepository;
     }
 
-    public async Task CreateNote(string token, CreateNoteRequest createNoteRequest)
+    public async Task<string> CreateNote(string token, CreateNoteRequest createNoteRequest)
     {
         Token<ObjectId>? parsedToken = _securityService.TryParseToken<ObjectId>(token, _mongoIdentityProvider);
         if (parsedToken == null)
@@ -61,7 +61,7 @@ public class NoteService : INoteService
             );
 
         await _mongoNotesRepository.InsertNote(note);
-        return;
+        return note.Id.ToString();
     }
 
     public async Task<bool> DeleteNote(string token, string noteId)

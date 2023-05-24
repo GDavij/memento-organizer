@@ -31,6 +31,17 @@ builder.Services.SetupDomain();
 // Add Application Rules (Validation, Middlewares, etc...)
 builder.Services.SetupApplicationRules();
 
+string corsPolicyName = "_mementoOrganizerDefaultOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(corsPolicyName, policy =>
+    {
+        policy.WithOrigins("http://127.0.0.1:3000", "http://localhost:3000");
+        policy.WithMethods("GET", "POST", "DELETE", "PUT", "OPTIONS");
+        policy.WithHeaders("content-type", "authorization");
+        // Just for now at Development
+    });
+});
 
 string region = Environment.GetEnvironmentVariable("AWS_REGION") ?? RegionEndpoint.USEast2.SystemName;
 
@@ -41,7 +52,10 @@ builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); Remove for CORS Reasons 
+//TODO: Resolve those Problems
+app.UseCors(corsPolicyName);
+
 app.UseAuthorization();
 app.UseMiddleware<GlobalErrorHandlingMiddleware>();
 app.MapControllers();
