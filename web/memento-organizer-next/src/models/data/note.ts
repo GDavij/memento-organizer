@@ -1,3 +1,5 @@
+import { Descendant } from "slate";
+
 export type Note = {
   id: string;
   owner: string;
@@ -7,3 +9,12 @@ export type Note = {
   issued: string;
   lastUpdate: string;
 };
+
+type TNoteTypes = "paragraph" | "image";
+export type TBaseNoteData = {
+  type: TNoteTypes;
+  children: CustomText[];
+  url?: string;
+};
+
+export type CustomText = { text: string };

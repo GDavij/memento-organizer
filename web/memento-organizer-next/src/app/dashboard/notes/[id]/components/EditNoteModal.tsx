@@ -29,7 +29,7 @@ export default function CreateNoteModal({
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<TCreateNoteRequest>();
+  } = useForm<TUpdateNoteRequest>();
 
   const router = useRouter();
   const [note, setNote] = useState<Note | null>(null);
@@ -51,13 +51,13 @@ export default function CreateNoteModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  async function handleNoteEdition(formData: TCreateNoteRequest) {
-    if (formData.name.length < 4) {
+  async function handleNoteEdition(formData: TUpdateNoteRequest) {
+    if (formData.name!.length < 4) {
       toast.error("Name does not have the minimum length of 4");
       return;
     }
 
-    if (formData.description.length < 8) {
+    if (formData.description!.length < 8) {
       toast.error("Description does not have the minimum length of 8");
       return;
     }

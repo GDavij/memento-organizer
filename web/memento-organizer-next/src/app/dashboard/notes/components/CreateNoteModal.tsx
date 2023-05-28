@@ -2,11 +2,27 @@
 import notesService from "@/services/notes.service";
 import Modal, { BaseModalProps } from "@/app/components/Modal";
 import { TCreateNoteRequest } from "@/models/requests/noteRequests";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Loader from "@/app/components/Loader";
+import { Editable, ReactEditor, Slate, withReact } from "slate-react";
+import { CustomText, TBaseNoteData } from "@/models/data/note";
+import { BaseEditor, createEditor } from "slate";
+declare module "slate" {
+  interface CustomTypes {
+    Editor: BaseEditor & ReactEditor;
+    Element: TBaseNoteData;
+    Text: CustomText;
+  }
+}
+
+type TCreateNoteFormData = {
+  name: string;
+  description: string;
+  content: TBaseNoteData[];
+};
 
 export default function CreateNoteModal({ open, onClose }: BaseModalProps) {
   const router = useRouter();
@@ -14,8 +30,15 @@ export default function CreateNoteModal({ open, onClose }: BaseModalProps) {
     register,
     handleSubmit,
     reset,
+    getValues,
+    setValue,
     formState: { errors },
-  } = useForm<TCreateNoteRequest>();
+  } = useForm<TCreateNoteFormData>();
+
+  const editor = useMemo(() => withReact(createEditor()), []);
+  const [noteContent, setNoteContent] = useState<TBaseNoteData[]>([
+    { children: [{ text: "My Note Content" }], type: "paragraph" },
+  ]);
 
   const [isCreating, setIsCreating] = useState(false);
   useEffect(() => {
@@ -23,7 +46,7 @@ export default function CreateNoteModal({ open, onClose }: BaseModalProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  async function handleNoteCreation(formData: TCreateNoteRequest) {
+  async function handleNoteCreation(formData: TCreateNoteFormData) {
     if (formData.name.length < 4) {
       toast.error("Name does not have the minimum length of 4");
       return;
@@ -37,7 +60,7 @@ export default function CreateNoteModal({ open, onClose }: BaseModalProps) {
     const filteredBody: TCreateNoteRequest = {
       name: formData.name,
       description: formData.description,
-      content: formData.content,
+      content: JSON.stringify(formData.content),
     };
     setIsCreating(true);
     const noteId = await notesService.createNote(filteredBody);
@@ -92,14 +115,13 @@ export default function CreateNoteModal({ open, onClose }: BaseModalProps) {
         </label>
         <label className="w-full">
           Content
-          <textarea
-            readOnly={isCreating}
-            placeholder="Edit Your Note Here (It Works with markdown)"
-            {...register("content", { required: true })}
-            id="markdown-editor"
-            wrap="on"
-            className="bg-slate-300 dark:bg-slate-800 h-72 w-full p-2 rounded-lg  resize-none sm:text-xl md:text-2xl text-sm caret-emerald-500 selection:text-emerald-500 selection:bg-slate-200 dark:selection:bg-slate-900"
-          ></textarea>
+          <Slate
+            onChange={(value) => setValue("content", value as TBaseNoteData[])}
+            editor={editor}
+            value={noteContent}
+          >
+            <Editable className="w-full h-fit flex items-center justify-start bg-slate-300 dark:bg-slate-800 outline-none p-4 text-base rounded-md" />
+          </Slate>
           {errors.content?.type == "required" && (
             <div className="text-red-500">Content is Required</div>
           )}
