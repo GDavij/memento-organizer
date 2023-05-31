@@ -10,11 +10,22 @@ export type Note = {
   lastUpdate: string;
 };
 
-type TNoteTypes = "paragraph" | "image";
+type TNoteTypes = "paragraph"
+export type TTextMarks = "bold" | "italic" | "underline"
+export type THotKeys = {
+  "mod+b": "bold",
+  "mod+i": "italic",
+  "mod+u": "underline"
+}
+
 export type TBaseNoteData = {
   type: TNoteTypes;
   children: CustomText[];
   url?: string;
 };
 
-export type CustomText = { text: string };
+export type CustomText = {
+  text: string, bold?: boolean;
+  italic?: boolean;
+  underline?: boolean
+};
