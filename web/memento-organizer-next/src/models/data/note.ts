@@ -10,7 +10,10 @@ export type Note = {
   lastUpdate: string;
 };
 
-type TNoteTypes = "paragraph"
+
+export type TMarkdownTypes = "heading-1" | "heading-2" | "heading-3" | "heading-4" | "heading-5" | "heading-6" | "unorded-list";
+export const markdownTypes: TMarkdownTypes[] = ["heading-1", "heading-2", "heading-3", "heading-4", "heading-5", "heading-6", "unorded-list"]
+type TNoteTypes = "paragraph" | "image" | TMarkdownTypes;
 export type TTextMarks = "bold" | "italic" | "underline"
 export type THotKeys = {
   "mod+b": "bold",

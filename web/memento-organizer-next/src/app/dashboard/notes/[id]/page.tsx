@@ -4,6 +4,7 @@ import {
   MdAssignmentAdd,
   MdAutorenew,
   MdBuild,
+  MdDelete,
   MdFormatAlignCenter,
   MdFormatAlignJustify,
   MdFormatAlignLeft,
@@ -22,8 +23,11 @@ import {
   Note,
   TBaseNoteData,
   THotKeys,
+  TMarkdownTypes,
   TTextMarks,
+  markdownTypes,
 } from "@/models/data/note";
+import Image from "next/image";
 import {
   LegacyRef,
   Ref,
@@ -34,13 +38,21 @@ import {
   useRef,
   useState,
 } from "react";
-import { withHistory } from "slate-history";
+import { HistoryEditor, withHistory } from "slate-history";
 import notesService from "@/services/notes.service";
 import { useForm } from "react-hook-form";
 import { usePathname } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import Loader from "@/app/components/Loader";
-import { Editor, Location, Transforms, createEditor } from "slate";
+import {
+  Descendant,
+  Editor,
+  Location,
+  NodeEntry,
+  Transforms,
+  createEditor,
+  insertNode,
+} from "slate";
 import {
   Editable,
   RenderElementProps,
@@ -48,7 +60,7 @@ import {
   Slate,
   withReact,
 } from "slate-react";
-import { BaseEditor, Descendant } from "slate";
+import { BaseEditor, Element as SlateElement, Node as SlateNode } from "slate";
 import { ReactEditor } from "slate-react";
 
 declare module "slate" {
@@ -65,10 +77,54 @@ const hotKeys: THotKeys = {
   "mod+u": "underline",
 };
 
+const withImagesFromFiles = (editor: Editor) => {
+  const { isVoid, insertData } = editor;
+
+  editor.isVoid = (element) =>
+    element.type === "image" ? true : isVoid(element);
+
+  editor.insertData = (data) => {
+    console.log({ data });
+    const { files } = data;
+    if (files && files.length > 0) {
+      for (const file of files) {
+        const reader = new FileReader();
+        const [mime] = file.type.split("/");
+
+        if (mime === "image") {
+          reader.addEventListener("load", () => {
+            const url: string = reader.result as string;
+            insertImage(editor, url);
+          });
+
+          reader.readAsDataURL(file);
+        }
+      }
+    } else {
+      insertData(data);
+    }
+  };
+  return editor;
+};
+
+const withMarkdown = (editor: Editor) => {
+  const { node, onChange, nodes } = editor;
+  editor.onChange = (options) => {
+    if (options?.operation?.type == "insert_text") {
+      renderMarkdown(editor, node((options.operation as any).path));
+    }
+
+    onChange(options);
+  };
+
+  return editor;
+};
+
 export default function Notes() {
   const noteId = usePathname().split("/")[3];
   const renderElement = useCallback(
     (props: RenderElementProps) => <Element {...props} />,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
   const renderLeaf = useCallback(
@@ -81,7 +137,11 @@ export default function Notes() {
     []
   );
   const [noteContent, setNoteContent] = useState<TBaseNoteData[]>([]);
-  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+  const editor = useMemo(
+    () =>
+      withMarkdown(withImagesFromFiles(withHistory(withReact(createEditor())))),
+    []
+  );
 
   const [isFetchingNote, setIsFetchingNote] = useState(true);
   const [isSavingNote, setIsSavingNote] = useState(false);
@@ -130,6 +190,72 @@ export default function Notes() {
   const [isBoldMark, setIsBoldMark] = useState(false);
   const [isItalicMark, setIsItalicMark] = useState(false);
   const [isUnderlineMark, setIsUnderlineMark] = useState(false);
+
+  function Element(props: RenderElementProps) {
+    switch (props.element.type) {
+      case "image":
+        return <TextEditorImage editor={editor} renderProps={props} />;
+      case "heading-1":
+        return (
+          <h1 className="text-7xl" {...props.attributes}>
+            {props.children}
+          </h1>
+        );
+      case "heading-2":
+        return (
+          <h1 className="text-6xl" {...props.attributes}>
+            {props.children}
+          </h1>
+        );
+      case "heading-3":
+        return (
+          <h1 className="text-5xl" {...props.attributes}>
+            {props.children}
+          </h1>
+        );
+      case "heading-4":
+        return (
+          <h1 className="text-4xl" {...props.attributes}>
+            {props.children}
+          </h1>
+        );
+      case "heading-5":
+        return (
+          <h1 className="text-3xl" {...props.attributes}>
+            {props.children}
+          </h1>
+        );
+      case "heading-6":
+        return (
+          <h1 className="text-2xl" {...props.attributes}>
+            {props.children}
+          </h1>
+        );
+      case "unorded-list":
+        return (
+          <ul className=" list-none h-fit w-fit " {...props.attributes}>
+            <li className="text-emerald-500 text-xl ">{props.children}</li>
+          </ul>
+        );
+    }
+    return <p {...props.attributes}>{props.children}</p>;
+  }
+
+  function Leaf({ attributes, children, leaf, text }: RenderLeafProps) {
+    if (leaf.bold) {
+      children = <strong>{children}</strong>;
+    }
+
+    if (leaf.italic) {
+      children = <em>{children}</em>;
+    }
+
+    if (leaf.underline) {
+      children = <u>{children}</u>;
+    }
+
+    return <span {...attributes}>{children}</span>;
+  }
 
   return (
     <>
@@ -215,7 +341,6 @@ export default function Notes() {
               if (isUnderline != isUnderlineMark) {
                 setIsUnderlineMark(isUnderline);
               }
-
               setNoteContent(value as TBaseNoteData[]);
             }}
             editor={editor}
@@ -240,10 +365,10 @@ export default function Notes() {
                   await saveNote();
                 } else if (isHotkey("mod+z", event)) {
                   event.preventDefault();
-                  editor.undo();
+                  (editor as unknown as HistoryEditor).undo();
                 } else if (isHotkey("mod+y", event)) {
                   event.preventDefault();
-                  editor.redo();
+                  (editor as unknown as HistoryEditor).redo();
                 } else if (isHotkey("tab", event as any)) {
                   event.preventDefault();
                   Transforms.insertText(editor, "   ");
@@ -273,26 +398,92 @@ export default function Notes() {
   );
 }
 
-function Element({ attributes, children, element }: RenderElementProps) {
-  // switch (element.type) {
-  //   case "paragraph":
-  //     return <p {...attributes}>{children}</p>;
-  // }
-  return <p {...attributes}>{children}</p>;
-}
+const insertImage = (editor: Editor, url: string) => {
+  const text = { text: "" };
+  const image: TBaseNoteData = { type: "image", url, children: [text] };
+  Transforms.insertNodes(editor, image);
+};
+const renderMarkdown = (editor: Editor, nodeEntry: NodeEntry) => {
+  let text = (nodeEntry[0] as { text: string }).text;
 
-function Leaf({ attributes, children, leaf, text }: RenderLeafProps) {
-  if (leaf.bold) {
-    children = <strong>{children}</strong>;
+  let headers = 0;
+  if (text[0] === "#") {
+    headers++;
+    for (let i = 1; i < 6; i++) {
+      if (text[i] === "#") {
+        headers++;
+      }
+    }
+    if (text[headers] == " ") {
+      switch (headers) {
+        case 1:
+          Transforms.setNodes(editor, {
+            type: "heading-1",
+          });
+          break;
+        case 2:
+          Transforms.setNodes(editor, {
+            type: "heading-2",
+          });
+          break;
+        case 3:
+          Transforms.setNodes(editor, {
+            type: "heading-3",
+          });
+          break;
+        case 4:
+          Transforms.setNodes(editor, {
+            type: "heading-4",
+          });
+          break;
+        case 5:
+          Transforms.setNodes(editor, {
+            type: "heading-5",
+          });
+          break;
+        case 6:
+          Transforms.setNodes(editor, {
+            type: "heading-6",
+          });
+          break;
+      }
+      return;
+    }
   }
 
-  if (leaf.italic) {
-    children = <em>{children}</em>;
+  if (text[0] === "-" && text[1] === " ") {
+    Transforms.setNodes(editor, { type: "unorded-list" });
+    return;
   }
+  Transforms.setNodes(editor, {
+    type: "paragraph",
+  });
+  // Transforms.insertNodes(editor, markdown);
+};
 
-  if (leaf.underline) {
-    children = <u>{children}</u>;
-  }
-
-  return <span {...attributes}>{children}</span>;
+type TTextEditorImageProps = {
+  editor: Editor;
+  renderProps: RenderElementProps;
+};
+function TextEditorImage(props: TTextEditorImageProps) {
+  const path = ReactEditor.findPath(props.editor, props.renderProps.element);
+  return (
+    <div
+      {...props.renderProps.attributes}
+      className="flex w-fit h-fit items-start"
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element*/}
+      <img
+        src={props.renderProps.element.url!}
+        alt={"Image Could not be loaded or is unavaible"}
+      />
+      <button
+        onClick={() => Transforms.removeNodes(props.editor, { at: path })}
+        className="flex text-red-500 text-2xl -translate-x-8 z-20 translate-y-2"
+      >
+        <MdDelete />
+      </button>
+      {props.renderProps.children}
+    </div>
+  );
 }
