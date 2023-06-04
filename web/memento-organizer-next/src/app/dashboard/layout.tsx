@@ -3,10 +3,11 @@ import { SidebarProvider, useSidebar } from "./contexts/useSidebar";
 import { ReactNode, useState } from "react";
 import { NavigationBar } from "./components/navigationBar";
 import { TopBar } from "./components/topBar";
+import { EditorProvider } from "./contexts/editor/useEditor";
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { openClose, open } = useSidebar();
   return (
-    <>
+    <EditorProvider>
       <TopBar />
       <div className="w-full h-full flex flex-shrink flex-grow-0 overflow-auto">
         <NavigationBar hidden={open} />
@@ -14,6 +15,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           {children}
         </div>
       </div>
-    </>
+    </EditorProvider>
   );
 }
