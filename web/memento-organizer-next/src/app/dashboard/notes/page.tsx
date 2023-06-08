@@ -15,7 +15,10 @@ import { ToastContainer, toast } from "react-toastify";
 import Loader from "@/app/components/Loader";
 import { useForm } from "react-hook-form";
 import CreateNoteModal from "./components/CreateNoteModal";
+import { useTopBar } from "../contexts/useTopBar";
 export default function Notes() {
+  const { setPageDetails } = useTopBar();
+
   type TFilterOptions =
     | "Id"
     | "Name"
@@ -78,6 +81,7 @@ export default function Notes() {
     toast.success("Notes fetched with sucess");
   }
   useEffect(() => {
+    setPageDetails({ pageName: "Notes List" });
     fetchNotes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

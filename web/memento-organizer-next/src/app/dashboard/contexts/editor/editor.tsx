@@ -219,8 +219,7 @@ export function EditorScreen({
         setNoteContent(value as TBaseNoteData[]);
       }}
       editor={editor}
-      value={noteContent as TBaseNoteData[]}
-    >
+      value={noteContent as TBaseNoteData[]}>
       <Editable
         value={JSON.stringify(noteContent)}
         renderElement={renderElement}
@@ -381,8 +380,7 @@ function TextEditorImage(props: TTextEditorImageProps) {
   return (
     <div
       {...props.renderProps.attributes}
-      className="flex w-fit h-fit items-start"
-    >
+      className="flex w-fit h-fit items-start">
       {/* eslint-disable-next-line @next/next/no-img-element*/}
       <img
         src={props.renderProps.element.url!}
@@ -390,8 +388,7 @@ function TextEditorImage(props: TTextEditorImageProps) {
       />
       <button
         onClick={() => Transforms.removeNodes(props.editor, { at: path })}
-        className="flex text-red-500 text-2xl -translate-x-8 z-20 translate-y-2"
-      >
+        className="flex text-red-500 text-2xl -translate-x-8 z-20 translate-y-2">
         <MdDelete />
       </button>
       {props.renderProps.children}

@@ -61,13 +61,15 @@ import {
   useEditor,
 } from "../../contexts/editor/useEditor";
 import { Note } from "@/models/data/note";
+import { useTopBar } from "../../contexts/useTopBar";
 
 export default function Notes() {
+  const { setPageDetails } = useTopBar();
+
   const noteId = usePathname().split("/")[3];
 
   const [isFetchingNote, setIsFetchingNote] = useState(true);
   const [isSavingNote, setIsSavingNote] = useState(false);
-  const [isEditingNote, setIsEditingNote] = useState(false);
   const editorContext = useEditor();
   const [note, setNote] = useState<Note | null>(null);
 
@@ -87,10 +89,17 @@ export default function Notes() {
     const noteFetched = await notesService.getNote(noteId);
     console.log(noteFetched);
     setNote(noteFetched);
+    setPageDetails({
+      pageName: noteFetched.name,
+      editorOptionsContext: noteFetched,
+    });
     setIsFetchingNote(false);
   }
 
   useEffect(() => {
+    if (editorContext.isEditingNoteMetadata) {
+      editorContext.setIsEditingNoteMetadata(false);
+    }
     fetchNote();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -112,8 +121,7 @@ export default function Notes() {
               className={`grid place-content-center text-xl ${
                 editorContext.isBold ? "text-emerald-500" : ""
               }
-              }`}
-            >
+              }`}>
               <MdFormatBold />
             </button>
             <button
@@ -125,8 +133,7 @@ export default function Notes() {
               }}
               className={`grid place-content-center text-xl ${
                 editorContext.isItalic ? "text-emerald-500" : ""
-              }`}
-            >
+              }`}>
               <MdFormatItalic />
             </button>
             <button
@@ -138,8 +145,7 @@ export default function Notes() {
               }}
               className={`grid place-content-center text-xl 
               ${editorContext.isUnderline ? "text-emerald-500" : ""}
-              `}
-            >
+              `}>
               <MdFormatUnderlined />
             </button>
           </div>
@@ -149,8 +155,7 @@ export default function Notes() {
             onClick={saveNote}
             className={`p-2 bg-emerald-600 hover:bg-emerald-700 transition-colors rounded-lg text-white flex gap-2 items-center sm:w-40 w-28 justify-center disabled:bg-slate-100 disabled:text-slate-400 dark:disabled:text-slate-500 dark:disabled:bg-slate-800 flex-grow-0 flex-shrink-0 ${
               isFetchingNote ? "cursor-not-allowed" : ""
-            } ${isSavingNote ? "cursor-progress" : ""}`}
-          >
+            } ${isSavingNote ? "cursor-progress" : ""}`}>
             <span className="sm:text-lg text-sm">
               {isSavingNote ? "Saving" : "Save File"}
             </span>
@@ -164,8 +169,7 @@ export default function Notes() {
       </div>
       <label
         htmlFor={editorId}
-        className="sm:ml-0 ml-5 w-11/12 h-fit min-h-screen bg-white dark:bg-slate-700 sticky  px-2 py-4 sm:p-4 flex flex-col flex-grow flex-shrink-0 mb-8 drop-shadow-lg  gap-4"
-      >
+        className="sm:ml-0 ml-5 w-11/12 h-fit min-h-screen bg-white dark:bg-slate-700 sticky  px-2 py-4 sm:p-4 flex flex-col flex-grow flex-shrink-0 mb-8 drop-shadow-lg  gap-4">
         {note ? (
           <EditorScreen
             disabled={false}
@@ -178,12 +182,8 @@ export default function Notes() {
       </label>
       <EditNoteModal
         refetchNoteCb={fetchNote}
-        open={
-          {
-            /*note != null*/
-          } && isEditingNote
-        }
-        onClose={() => setIsEditingNote(false)}
+        open={editorContext.isEditingNoteMetadata}
+        onClose={() => editorContext.setIsEditingNoteMetadata(false)}
         id={noteId}
       />
       <ToastContainer />

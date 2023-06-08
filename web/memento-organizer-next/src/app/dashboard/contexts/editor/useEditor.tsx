@@ -43,6 +43,8 @@ type TEditorContext = {
   setIsItalic: (value: boolean) => void;
   isUnderline: boolean;
   setIsUnderline: (value: boolean) => void;
+  isEditingNoteMetadata: boolean;
+  setIsEditingNoteMetadata: (isEditing: boolean) => void;
 };
 
 const EditorContext = createContext<TEditorContext>({
@@ -56,6 +58,8 @@ const EditorContext = createContext<TEditorContext>({
   setIsItalic(newValue: boolean) {},
   isUnderline: false,
   setIsUnderline(newValue: boolean) {},
+  isEditingNoteMetadata: false,
+  setIsEditingNoteMetadata(isEditing: boolean) {},
 });
 
 export function EditorProvider({ children }: { children: ReactNode }) {
@@ -64,6 +68,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
+  const [isEditingNoteMetadata, setIsEditingNoteMetadata] = useState(false);
 
   const editorActions: TEditorContext = {
     editor: editor,
@@ -85,6 +90,10 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     isUnderline,
     setIsUnderline(newValue: boolean) {
       setIsUnderline(newValue);
+    },
+    isEditingNoteMetadata,
+    setIsEditingNoteMetadata: (isEditing: boolean) => {
+      setIsEditingNoteMetadata(isEditing);
     },
   };
 
