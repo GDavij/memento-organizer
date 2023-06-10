@@ -55,7 +55,8 @@ export type TMarkdownTypes =
   | "heading-4"
   | "heading-5"
   | "heading-6"
-  | "unorded-list";
+  | "unordered-list"
+  | "ordered-list";
 export const markdownTypes: TMarkdownTypes[] = [
   "heading-1",
   "heading-2",
@@ -63,9 +64,10 @@ export const markdownTypes: TMarkdownTypes[] = [
   "heading-4",
   "heading-5",
   "heading-6",
-  "unorded-list",
+  "unordered-list",
+  "ordered-list",
 ];
-type TNoteTypes = "paragraph" | "image" | TMarkdownTypes;
+export type TNoteTypes = "paragraph" | "image" | TMarkdownTypes;
 export type TTextMarks = "bold" | "italic" | "underline";
 export type CustomText = {
   text: string;
@@ -84,12 +86,14 @@ type TEditorScreenProps = {
   disabled: boolean;
   initialNoteContent: TBaseNoteData[];
   saveNoteCallback: () => Promise<void>;
+  editorId: string;
 };
 
 export function EditorScreen({
   disabled,
   initialNoteContent,
   saveNoteCallback,
+  editorId,
 }: TEditorScreenProps) {
   const {
     setEditor,
@@ -101,6 +105,8 @@ export function EditorScreen({
     setIsItalic,
     isUnderline,
     setIsUnderline,
+    noteType,
+    setNoteType,
   } = useEditor();
 
   const editor = useMemo(
@@ -129,6 +135,7 @@ export function EditorScreen({
   );
 
   function Element(props: RenderElementProps) {
+    console.log(props.children);
     switch (props.element.type) {
       case "image":
         return <TextEditorImage editor={editor} renderProps={props} />;
@@ -168,7 +175,13 @@ export function EditorScreen({
             {props.children}
           </h1>
         );
-      case "unorded-list":
+      case "unordered-list":
+        return (
+          <ul className=" list-none h-fit w-fit " {...props.attributes}>
+            <li className="text-emerald-500 text-xl ">{props.children}</li>
+          </ul>
+        );
+      case "ordered-list":
         return (
           <ul className=" list-none h-fit w-fit " {...props.attributes}>
             <li className="text-emerald-500 text-xl ">{props.children}</li>
@@ -205,6 +218,13 @@ export function EditorScreen({
         const isBoldMark = isMarkActive(editor, "bold");
         const isItalicMark = isMarkActive(editor, "italic");
         const isUnderlineMark = isMarkActive(editor, "underline");
+
+        const focusLine = editor.selection!.focus.path[0];
+        const dataType = (value as TBaseNoteData[])[focusLine].type;
+        if (noteType != dataType) {
+          setNoteType(dataType);
+        }
+
         if (isBold != isBoldMark) {
           setIsBold(isBoldMark);
         }
@@ -221,6 +241,7 @@ export function EditorScreen({
       editor={editor}
       value={noteContent as TBaseNoteData[]}>
       <Editable
+        id={editorId}
         value={JSON.stringify(noteContent)}
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -230,6 +251,33 @@ export function EditorScreen({
         autoFocus
         className="w-full h-full cursor-text caret-emerald-500 selection:text-emerald-500 selection:bg-slate-200 dark:selection:bg-slate-900"
         onKeyDown={async (event) => {
+          if (isHotkey("backspace", event as any)) {
+            const focusLine = editor.selection!.focus.path[0];
+            const dataType = (editor.children as TBaseNoteData[])[focusLine]
+              .type;
+            if (dataType != noteType) {
+              setNoteType(dataType);
+            }
+          }
+          if (isHotkey("enter", event as any)) {
+            const focusLine = editor.selection!.focus.path[0];
+            const data = (editor.children as TBaseNoteData[])[focusLine];
+            if (data.type === "ordered-list") {
+              event.preventDefault();
+              Transforms.insertNodes(editor, {
+                type: "ordered-list",
+                children: [
+                  { text: `${countOrderedListN(data.children[0].text) + 1}. ` },
+                ],
+              });
+            } else if (data.type === "unordered-list") {
+              event.preventDefault();
+              Transforms.insertNodes(editor, {
+                type: "unordered-list",
+                children: [{ text: "- " }],
+              });
+            }
+          }
           //TODO: Refactor the hotKeys
           if (isHotkey("mod+s", event as any)) {
             event.preventDefault();
@@ -360,9 +408,40 @@ const renderMarkdown = (editor: Editor, nodeEntry: NodeEntry) => {
       return;
     }
   }
+  let orderedListProbability = [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+  ];
+  if (orderedListProbability.includes(text[0])) {
+    if (text[1] === "." && text[2] == " ") {
+      Transforms.setNodes(editor, { type: "ordered-list" });
+      return;
+    } else {
+      let isOrdered = 0;
+      let i = 0;
+      while (i < text.length - 2) {
+        if (orderedListProbability.includes(text[i])) {
+          isOrdered++;
+        }
+        i++;
+      }
 
+      if (text[isOrdered] === "." && text[isOrdered + 1] === " ") {
+        Transforms.setNodes(editor, { type: "ordered-list" });
+        return;
+      }
+    }
+  }
   if (text[0] === "-" && text[1] === " ") {
-    Transforms.setNodes(editor, { type: "unorded-list" });
+    Transforms.setNodes(editor, { type: "unordered-list" });
     return;
   }
   Transforms.setNodes(editor, {
@@ -395,3 +474,30 @@ function TextEditorImage(props: TTextEditorImageProps) {
     </div>
   );
 }
+
+const countOrderedListN = (text: string): number => {
+  console.log(text);
+  let orderedListProbability = [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+  ];
+  let count = 0;
+  for (let i = 0; i < text.length; i++) {
+    if (orderedListProbability.includes(text[i])) {
+      count++;
+    }
+    if (text[i] === ".") {
+      break;
+    }
+  }
+  console.log(text.slice(0, count));
+  return Number(text.slice(0, count));
+};

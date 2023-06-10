@@ -30,7 +30,7 @@ import {
 import { HistoryEditor, withHistory } from "slate-history";
 import isHotkey from "is-hotkey";
 import { MdDelete } from "react-icons/md";
-import { TBaseNoteData, TTextMarks } from "./editor";
+import { TBaseNoteData, TNoteTypes, TTextMarks } from "./editor";
 
 type TEditorContext = {
   editor: Editor | null;
@@ -45,6 +45,8 @@ type TEditorContext = {
   setIsUnderline: (value: boolean) => void;
   isEditingNoteMetadata: boolean;
   setIsEditingNoteMetadata: (isEditing: boolean) => void;
+  noteType: TNoteTypes;
+  setNoteType: (noteType: TNoteTypes) => void;
 };
 
 const EditorContext = createContext<TEditorContext>({
@@ -60,6 +62,8 @@ const EditorContext = createContext<TEditorContext>({
   setIsUnderline(newValue: boolean) {},
   isEditingNoteMetadata: false,
   setIsEditingNoteMetadata(isEditing: boolean) {},
+  noteType: "paragraph",
+  setNoteType(noteType: TNoteTypes) {},
 });
 
 export function EditorProvider({ children }: { children: ReactNode }) {
@@ -69,6 +73,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
   const [isEditingNoteMetadata, setIsEditingNoteMetadata] = useState(false);
+  const [noteType, setNoteType] = useState<TNoteTypes>("paragraph");
 
   const editorActions: TEditorContext = {
     editor: editor,
@@ -94,6 +99,10 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     isEditingNoteMetadata,
     setIsEditingNoteMetadata: (isEditing: boolean) => {
       setIsEditingNoteMetadata(isEditing);
+    },
+    noteType,
+    setNoteType(noteType: TNoteTypes) {
+      setNoteType(noteType);
     },
   };
 

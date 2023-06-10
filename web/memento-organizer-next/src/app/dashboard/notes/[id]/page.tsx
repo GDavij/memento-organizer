@@ -12,6 +12,8 @@ import {
   MdFormatBold,
   MdFormatItalic,
   MdFormatUnderlined,
+  MdOutlineFormatListBulleted,
+  MdOutlineFormatListNumbered,
   MdOutlineSquare,
   MdSettings,
   MdVisibility,
@@ -54,7 +56,11 @@ import {
 } from "slate-react";
 import { BaseEditor, Element as SlateElement, Node as SlateNode } from "slate";
 import { ReactEditor } from "slate-react";
-import { EditorScreen, TBaseNoteData } from "../../contexts/editor/editor";
+import {
+  EditorScreen,
+  TBaseNoteData,
+  TNoteTypes,
+} from "../../contexts/editor/editor";
 import {
   isMarkActive,
   toggleMark,
@@ -62,7 +68,27 @@ import {
 } from "../../contexts/editor/useEditor";
 import { Note } from "@/models/data/note";
 import { useTopBar } from "../../contexts/useTopBar";
-
+const removeLastHeading = (text: string, lastHeading: TNoteTypes) => {
+  switch (lastHeading) {
+    case "heading-1":
+      return text.slice(1, text.length);
+    case "heading-2":
+      return text.slice(2, text.length);
+    case "heading-3":
+      return text.slice(3, text.length);
+    case "heading-4":
+      return text.slice(4, text.length);
+    case "heading-5":
+      return text.slice(5, text.length);
+    case "heading-6":
+      return text.slice(6, text.length);
+    case "unordered-list":
+      return text.slice(1, text.length);
+    case "ordered-list":
+      return text.slice(4, text.length);
+  }
+  return text;
+};
 export default function Notes() {
   const { setPageDetails } = useTopBar();
 
@@ -106,17 +132,62 @@ export default function Notes() {
 
   const editorId = useId();
 
+  const auxilarMarkdownFuntion = (
+    markSymbolizer: string,
+    noteTypeCondition: TNoteTypes,
+    actualType: TNoteTypes
+  ) => {
+    const line = editorContext.editor!.selection!.focus.path[0];
+    if (actualType != noteTypeCondition) {
+      if (Number.isInteger(line)) {
+        const data = editorContext.noteContent[line];
+        if (data.type == "image") {
+          return;
+        } else {
+          let old = data.children[0].text;
+          old = markSymbolizer + removeLastHeading(old, actualType);
+
+          Transforms.insertText(editorContext.editor!, old, {
+            at: [line, 0],
+          });
+          console.log(noteTypeCondition + " - Test");
+          Transforms.setNodes(editorContext.editor!, {
+            type: noteTypeCondition,
+          });
+        }
+      }
+    } else {
+      if (Number.isInteger(line)) {
+        const data = editorContext.noteContent[line];
+        if (data.type == "image") {
+          return;
+        } else {
+          let old = data.children[0].text;
+          old = removeLastHeading(old, noteTypeCondition);
+          Transforms.insertText(editorContext.editor!, old, {
+            at: [line, 0],
+          });
+          console.log("Paragraph - Test");
+          Transforms.setNodes(editorContext.editor!, {
+            type: "paragraph",
+          });
+        }
+      }
+    }
+  };
+
   return (
     <>
       <div className="sm:ml-0 ml-5 w-11/12 md:flex-nowrap flex-wrap bg-white dark:bg-slate-700 sticky top-0 px-2 py-4 sm:p-4 flex flex-col items-start justify-start mb-8 drop-shadow-lg z-10 gap-4">
         <div className="flex w-full justify-between gap-4">
-          <div className="flex items-center flex-wrap md:w-[60%] w-full h-full p-2 bg-slate-200 dark:bg-slate-800 rounded-lg gap-8">
+          <div className="flex items-center overflow-auto flex-nowrap md:w-[60%] w-full h-full p-2 bg-slate-200 dark:bg-slate-800 rounded-lg gap-8">
             <button
               onClick={() => {
                 toggleMark(editorContext.editor!, "bold");
                 editorContext.setIsBold(
                   isMarkActive(editorContext.editor!, "bold")
                 );
+                document.getElementById(editorId)?.focus();
               }}
               className={`grid place-content-center text-xl ${
                 editorContext.isBold ? "text-emerald-500" : ""
@@ -130,6 +201,7 @@ export default function Notes() {
                 editorContext.setIsItalic(
                   isMarkActive(editorContext.editor!, "italic")
                 );
+                document.getElementById(editorId)?.focus();
               }}
               className={`grid place-content-center text-xl ${
                 editorContext.isItalic ? "text-emerald-500" : ""
@@ -142,17 +214,153 @@ export default function Notes() {
                 editorContext.setIsUnderline(
                   isMarkActive(editorContext.editor!, "underline")
                 );
+                document.getElementById(editorId)?.focus();
               }}
               className={`grid place-content-center text-xl 
               ${editorContext.isUnderline ? "text-emerald-500" : ""}
               `}>
               <MdFormatUnderlined />
             </button>
+            <button
+              onClick={() => {
+                document.getElementById(editorId)?.focus();
+                auxilarMarkdownFuntion(
+                  "# ",
+                  "heading-1",
+                  editorContext.noteType
+                );
+              }}
+              className={`grid place-content-center text-xl 
+              ${
+                editorContext.noteType === "heading-1" ? "text-emerald-500" : ""
+              }
+              `}>
+              H1
+            </button>
+            <button
+              onClick={() => {
+                document.getElementById(editorId)?.focus();
+                auxilarMarkdownFuntion(
+                  "## ",
+                  "heading-2",
+                  editorContext.noteType
+                );
+              }}
+              className={`grid place-content-center text-xl 
+              ${
+                editorContext.noteType === "heading-2" ? "text-emerald-500" : ""
+              }
+              `}>
+              H2
+            </button>
+            <button
+              onClick={() => {
+                document.getElementById(editorId)?.focus();
+                auxilarMarkdownFuntion(
+                  "### ",
+                  "heading-3",
+                  editorContext.noteType
+                );
+              }}
+              className={`grid place-content-center text-xl 
+              ${
+                editorContext.noteType === "heading-3" ? "text-emerald-500" : ""
+              }
+              `}>
+              H3
+            </button>
+            <button
+              onClick={() => {
+                document.getElementById(editorId)?.focus();
+                auxilarMarkdownFuntion(
+                  "#### ",
+                  "heading-4",
+                  editorContext.noteType
+                );
+              }}
+              className={`grid place-content-center text-xl 
+              ${
+                editorContext.noteType === "heading-4" ? "text-emerald-500" : ""
+              }
+              `}>
+              H4
+            </button>
+            <button
+              onClick={() => {
+                document.getElementById(editorId)?.focus();
+                auxilarMarkdownFuntion(
+                  "##### ",
+                  "heading-5",
+                  editorContext.noteType
+                );
+              }}
+              className={`grid place-content-center text-xl 
+              ${
+                editorContext.noteType === "heading-5" ? "text-emerald-500" : ""
+              }
+              `}>
+              H5
+            </button>
+            <button
+              onClick={() => {
+                document.getElementById(editorId)?.focus();
+                auxilarMarkdownFuntion(
+                  "###### ",
+                  "heading-6",
+                  editorContext.noteType
+                );
+              }}
+              className={`grid place-content-center text-xl 
+              ${
+                editorContext.noteType === "heading-6" ? "text-emerald-500" : ""
+              }
+              `}>
+              H6
+            </button>
+            <button
+              onClick={() => {
+                document.getElementById(editorId)?.focus();
+                auxilarMarkdownFuntion(
+                  "- ",
+                  "unordered-list",
+                  editorContext.noteType
+                );
+              }}
+              className={`grid place-content-center text-xl 
+              ${
+                editorContext.noteType === "unordered-list"
+                  ? "text-emerald-500"
+                  : ""
+              }
+              `}>
+              <MdOutlineFormatListBulleted />
+            </button>
+            <button
+              onClick={() => {
+                document.getElementById(editorId)?.focus();
+                auxilarMarkdownFuntion(
+                  "1. ",
+                  "ordered-list",
+                  editorContext.noteType
+                );
+              }}
+              className={`grid place-content-center text-xl 
+              ${
+                editorContext.noteType === "ordered-list"
+                  ? "text-emerald-500"
+                  : ""
+              }
+              `}>
+              <MdOutlineFormatListNumbered />
+            </button>
           </div>
 
           <button
             disabled={isSavingNote || isFetchingNote}
-            onClick={saveNote}
+            onClick={() => {
+              document.getElementById(editorId)?.focus();
+              saveNote();
+            }}
             className={`p-2 bg-emerald-600 hover:bg-emerald-700 transition-colors rounded-lg text-white flex gap-2 items-center sm:w-40 w-28 justify-center disabled:bg-slate-100 disabled:text-slate-400 dark:disabled:text-slate-500 dark:disabled:bg-slate-800 flex-grow-0 flex-shrink-0 ${
               isFetchingNote ? "cursor-not-allowed" : ""
             } ${isSavingNote ? "cursor-progress" : ""}`}>
@@ -172,6 +380,7 @@ export default function Notes() {
         className="sm:ml-0 ml-5 w-11/12 h-fit min-h-screen bg-white dark:bg-slate-700 sticky  px-2 py-4 sm:p-4 flex flex-col flex-grow flex-shrink-0 mb-8 drop-shadow-lg  gap-4">
         {note ? (
           <EditorScreen
+            editorId={editorId}
             disabled={false}
             initialNoteContent={JSON.parse(note.content) as TBaseNoteData[]}
             saveNoteCallback={saveNote}

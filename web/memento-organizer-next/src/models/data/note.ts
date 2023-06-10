@@ -1,5 +1,3 @@
-import { Descendant } from "slate";
-
 export type Note = {
   id: string;
   owner: string;
