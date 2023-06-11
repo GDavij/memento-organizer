@@ -8,20 +8,13 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Loader from "@/app/components/Loader";
 import { Editable, ReactEditor, Slate, withReact } from "slate-react";
-import { CustomText, TBaseNoteData } from "../../contexts/editor/editor";
-import { BaseEditor, createEditor } from "slate";
-declare module "slate" {
-  interface CustomTypes {
-    Editor: BaseEditor & ReactEditor;
-    Element: TBaseNoteData;
-    Text: CustomText;
-  }
-}
+
+import { BaseEditor, Descendant, createEditor } from "slate";
 
 type TCreateNoteFormData = {
   name: string;
   description: string;
-  content: TBaseNoteData[];
+  content: Descendant[];
 };
 
 export default function CreateNoteModal({ open, onClose }: BaseModalProps) {
@@ -36,7 +29,7 @@ export default function CreateNoteModal({ open, onClose }: BaseModalProps) {
   } = useForm<TCreateNoteFormData>();
 
   const editor = useMemo(() => withReact(createEditor()), []);
-  const [noteContent, setNoteContent] = useState<TBaseNoteData[]>([
+  const [noteContent, setNoteContent] = useState<Descendant[]>([
     { children: [{ text: "My Note Content" }], type: "paragraph" },
   ]);
 
@@ -116,7 +109,7 @@ export default function CreateNoteModal({ open, onClose }: BaseModalProps) {
         <label className="w-full">
           Content
           <Slate
-            onChange={(value) => setValue("content", value as TBaseNoteData[])}
+            onChange={(value) => setValue("content", value as Descendant[])}
             editor={editor}
             value={noteContent}
           >

@@ -1,42 +1,12 @@
-"use client";
-import {
-  Editable,
-  ReactEditor,
-  RenderElementProps,
-  RenderLeafProps,
-  Slate,
-  withReact,
-} from "slate-react";
-import {
-  Dispatch,
-  Provider,
-  ReactNode,
-  SetStateAction,
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
-import {
-  BaseEditor,
-  Editor,
-  Transforms,
-  createEditor,
-  Element as SlateElement,
-  Node as SlateNode,
-  NodeEntry,
-} from "slate";
-import { HistoryEditor, withHistory } from "slate-history";
-import isHotkey from "is-hotkey";
-import { MdDelete } from "react-icons/md";
-import { TBaseNoteData, TNoteTypes, TTextMarks } from "./editor";
+import { TBaseNoteData, TNoteTypes } from "@/models/data/editorTypes";
+import { ReactNode, createContext, useContext, useState } from "react";
+import { Descendant, Editor } from "slate";
 
 type TEditorContext = {
   editor: Editor | null;
   setEditor: (editor: Editor) => void;
-  noteContent: TBaseNoteData[];
-  setNoteContent: (newContent: TBaseNoteData[]) => void;
+  noteContent: Descendant[];
+  setNoteContent: (newContent: Descendant[]) => void;
   isBold: boolean;
   setIsBold: (value: boolean) => void;
   isItalic: boolean;
@@ -53,7 +23,7 @@ const EditorContext = createContext<TEditorContext>({
   editor: null,
   setEditor(editor: Editor) {},
   noteContent: [{ type: "paragraph", children: [{ text: "" }] }],
-  setNoteContent(newContent: TBaseNoteData[]) {},
+  setNoteContent(newContent: Descendant[]) {},
   isBold: false,
   setIsBold(newValue: boolean) {},
   isItalic: false,
@@ -68,7 +38,7 @@ const EditorContext = createContext<TEditorContext>({
 
 export function EditorProvider({ children }: { children: ReactNode }) {
   const [editor, setEditor] = useState<Editor | null>(null);
-  const [editorContent, setEditorContent] = useState<TBaseNoteData[]>([]);
+  const [editorContent, setEditorContent] = useState<Descendant[]>([]);
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
@@ -114,24 +84,3 @@ export function EditorProvider({ children }: { children: ReactNode }) {
 }
 
 export const useEditor = () => useContext(EditorContext);
-
-//Context Function for Use on Toolbar
-export function isMarkActive(
-  editor: BaseEditor & ReactEditor,
-  format: TTextMarks
-) {
-  const marks = Editor.marks(editor);
-  return marks ? marks[format] === true : false;
-}
-
-export function toggleMark(
-  editor: BaseEditor & ReactEditor,
-  format: TTextMarks
-) {
-  const isActive = isMarkActive(editor, format);
-  if (isActive) {
-    Editor.removeMark(editor, format);
-  } else {
-    Editor.addMark(editor, format, true);
-  }
-}
