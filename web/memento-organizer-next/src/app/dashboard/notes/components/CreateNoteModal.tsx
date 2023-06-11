@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Loader from "@/app/components/Loader";
 import { Editable, ReactEditor, Slate, withReact } from "slate-react";
-import { CustomText, TBaseNoteData } from "@/models/data/note";
+import { CustomText, TBaseNoteData } from "../../contexts/editor/editor";
 import { BaseEditor, createEditor } from "slate";
 declare module "slate" {
   interface CustomTypes {
