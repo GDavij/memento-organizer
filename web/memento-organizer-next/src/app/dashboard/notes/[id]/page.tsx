@@ -142,7 +142,6 @@ export default function Notes() {
           Transforms.insertText(editorContext.editor!, old, {
             at: [line, 0],
           });
-          console.log(noteTypeCondition + " - Test");
           Transforms.setNodes(editorContext.editor!, {
             type: noteTypeCondition,
           });
@@ -159,7 +158,6 @@ export default function Notes() {
           Transforms.insertText(editorContext.editor!, old, {
             at: [line, 0],
           });
-          console.log("Paragraph - Test");
           Transforms.setNodes(editorContext.editor!, {
             type: "paragraph",
           });
@@ -190,7 +188,6 @@ export default function Notes() {
             </button>
             <button
               onClick={() => {
-                console.log(editorContext);
                 toggleMark(editorContext.editor!, "italic");
                 editorContext.setIsItalic(
                   isMarkActive(editorContext.editor!, "italic")

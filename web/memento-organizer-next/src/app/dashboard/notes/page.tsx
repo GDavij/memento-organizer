@@ -77,7 +77,6 @@ export default function Notes() {
   async function fetchNotes() {
     setIsFetchingNotes(true);
     const aux = await notesService.getNotesByOwner();
-    console.log(aux);
     setNotes(aux);
     setFilteredNotes(aux.filter(filterSearch));
     setIsFetchingNotes(false);

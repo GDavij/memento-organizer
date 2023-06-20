@@ -33,7 +33,6 @@ export default function Login() {
         "/users/login",
         filteredBody
       );
-      console.log(response);
       toast.success("User successfully authenticated", {
         position: window.innerWidth < 640 ? "bottom-center" : "top-right",
       });

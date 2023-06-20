@@ -37,7 +37,6 @@ type ElementProps = {
   editor: Editor;
 };
 export function Element(props: ElementProps) {
-  console.log(props.renderProps.element.type);
   switch (props.renderProps.element.type) {
     case "image":
       return (
@@ -152,7 +151,6 @@ function ElementDisabled(props: TBaseNoteData) {
 
 export const renderElementDisabled = (note:Note) => {
   const noteContent:TBaseNoteData[] = JSON.parse(note.content);
-  console.log(noteContent);
   const nodes = noteContent.length === 1 && noteContent[0].children[0].text == "" ? 
   (
     <div>

@@ -32,7 +32,6 @@ export const insertImage = (editor: Editor, url: string) => {
 };
 
 export const countOrderedListN = (text: string): number => {
-    console.log(text);
     const orderedListProbability = [
         "0",
         "1",
@@ -54,6 +53,5 @@ export const countOrderedListN = (text: string): number => {
             break;
         }
     }
-    console.log(text.slice(0, count));
     return Number(text.slice(0, count));
 };
