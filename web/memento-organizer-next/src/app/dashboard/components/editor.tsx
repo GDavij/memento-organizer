@@ -41,14 +41,12 @@ import { Element } from "@/lib/editor/markdown.aux";
 import { renderMarkdown } from "@/lib/editor/renderer";
 
 type TEditorScreenProps = {
-  disabled?: boolean;
   initialNoteContent: Descendant[];
   saveNoteCallback: () => Promise<void>;
   editorId: string;
 };
 
 export function EditorScreen({
-  disabled = false,
   initialNoteContent,
   saveNoteCallback,
   editorId,
@@ -116,10 +114,9 @@ export function EditorScreen({
     >
       <Editable
         id={editorId}
-        renderElement={(props) => renderElement(props, editor, disabled)}
+        renderElement={(props) => renderElement(props, editor)}
         renderLeaf={(props) => renderLeaf(props)}
         placeholder="Start Writing"
-        disabled={disabled}
         spellCheck
         autoFocus
         className="w-full h-full cursor-text caret-emerald-500 selection:text-emerald-500 selection:bg-slate-200 dark:selection:bg-slate-900"

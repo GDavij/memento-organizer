@@ -387,7 +387,6 @@ export default function Notes() {
         {note ? (
           <EditorScreen
             editorId={editorId}
-            disabled={false}
             initialNoteContent={JSON.parse(note.content) as Descendant[]}
             saveNoteCallback={saveNote}
           />

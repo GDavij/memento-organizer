@@ -16,6 +16,9 @@ import Loader from "@/app/components/Loader";
 import { useForm } from "react-hook-form";
 import CreateNoteModal from "./components/CreateNoteModal";
 import { useTopBar } from "../contexts/useTopBar";
+import { TBaseNoteData } from "@/models/data/editorTypes";
+import { renderElement, renderElementDisabled } from "@/lib/editor/markdown.aux";
+import { render } from "react-dom";
 export default function Notes() {
   const { setPageDetails } = useTopBar();
 
@@ -148,7 +151,7 @@ export default function Notes() {
           filteredNotes.map((note) => (
             <div
               key={note.id}
-              className=" w-full xl:w-1/3 h-80 bg-slate-300 dark:bg-slate-800 p-4 hover:bg-emerald-300 dark:hover:bg-emerald-800 transition-colors duration-500 "
+              className=" w-full xl:w-1/3 h-fit  bg-slate-300 dark:bg-slate-800 p-4 hover:bg-emerald-300 dark:hover:bg-emerald-800 transition-colors duration-500 "
             >
               <Link
                 className="w-full h-full flex flex-col gap-8"
@@ -170,13 +173,15 @@ export default function Notes() {
                   <div>{note.id}</div>
                 </div>
                 <section className="font-light text-md text-slate-500 dark:text-gray-400 p-2 rounded-lg bg-slate-200 dark:bg-slate-700 flex flex-col gap-4">
-                  <div className="h-12">
+                  <div className="h-16">
                     <h3 className="font-bold">Description</h3>
                     <span className="truncate">{note.description}</span>
                   </div>
-                  <div className="h-12">
+                  <div className="h-24">
                     <h3 className="font-bold">Content</h3>
-                    <article className="truncate">{note.content}</article>
+                    <article className="truncate h-[80%] ">
+                      {renderElementDisabled(note)}
+                    </article>
                   </div>
                 </section>
                 <section className="bottom-0 font-light text-md text-slate-500 dark:text-gray-400 p-2 rounded-lg bg-slate-200 dark:bg-slate-700">

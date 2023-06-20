@@ -1,10 +1,9 @@
 import { MdDelete } from "react-icons/md";
-import { Editor, NodeEntry, Transforms } from "slate";
+import { Editor, Location, NodeEntry, Transforms } from "slate";
 import { ReactEditor, RenderElementProps, RenderLeafProps } from "slate-react";
 
 export const renderMarkdown = (editor: Editor, nodeEntry: NodeEntry) => {
-  let text = (nodeEntry[0] as { text: string }).text;
-  console.log({ subject: "renderer", text: text });
+  let text = (nodeEntry[0] as { text: string,  }).text;
   if (text) {
     let headers = 0;
     if (text[0] === "#") {
@@ -86,10 +85,6 @@ export const renderMarkdown = (editor: Editor, nodeEntry: NodeEntry) => {
       Transforms.setNodes(editor, { type: "unordered-list" });
       return;
     }
-    Transforms.setNodes(editor, {
-      type: "paragraph",
-    });
-  } else if (text === "") {
     Transforms.setNodes(editor, {
       type: "paragraph",
     });

@@ -1,4 +1,5 @@
 "use client";
+import { Note, TBaseNoteData, TBaseText } from "@/models/data/editorTypes";
 import { MdDelete } from "react-icons/md";
 import { Editor, Transforms } from "slate";
 import { ReactEditor, RenderElementProps, RenderLeafProps } from "slate-react";
@@ -13,7 +14,7 @@ export function TextEditorImage(props: TTextEditorImageProps) {
   return (
     <div
       {...props.renderProps.attributes}
-      className="flex w-fit h-fit items-start"
+      className="flex w-fit h-fit items-start cursor-grab"
     >
       {/* eslint-disable-next-line @next/next/no-img-element*/}
       <img
@@ -36,6 +37,7 @@ type ElementProps = {
   editor: Editor;
 };
 export function Element(props: ElementProps) {
+  console.log(props.renderProps.element.type);
   switch (props.renderProps.element.type) {
     case "image":
       return (
@@ -122,18 +124,50 @@ export function Leaf({ attributes, children, leaf }: RenderLeafProps) {
   return <span {...attributes}>{children}</span>;
 }
 
-export function ElementDisabled(props: RenderElementProps) {
-  if (props.element.type === "image") {
-    return <p {...props.attributes}>Embeded Image</p>;
+export function leafDisabled(leaf:TBaseText):JSX.Element {
+  if (leaf.bold) {
+    return <strong>{leaf.text}</strong>;
   }
 
-  return <p {...props.attributes}>{props.children}</p>;
+  if (leaf.italic) {
+    return <em>{leaf.text}</em>;
+  }
+
+  if (leaf.underline) {
+    return <u>{leaf.text}</u>;
+  }
+
+  return <span >{leaf.text}</span>;
+}
+
+
+
+function ElementDisabled(props: TBaseNoteData) {
+  if (props.type === "image") {
+    return <p className="truncate">[Embeded Image]</p>;
+  }
+
+  return <p className="truncate">{leafDisabled(props.children[0])}</p>;
+}
+
+export const renderElementDisabled = (note:Note) => {
+  const noteContent:TBaseNoteData[] = JSON.parse(note.content);
+  console.log(noteContent);
+  const nodes = noteContent.length === 1 && noteContent[0].children[0].text == "" ? 
+  (
+    <div>
+      <div>No Content here</div>
+      <div>Start Writing Something!</div> 
+    </div>
+  )
+    : noteContent.map((data,i) => <ElementDisabled key={note.id + i} {...data} />);
+    
+  return nodes;
 }
 
 export const renderElement = (
   props: RenderElementProps,
   editor: Editor,
-  disabled: boolean
 ) => <Element renderProps={props} editor={editor} />;
 
 export const renderLeaf = (props: RenderLeafProps) => <Leaf {...props} />;
