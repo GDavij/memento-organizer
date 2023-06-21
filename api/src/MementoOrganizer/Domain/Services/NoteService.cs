@@ -34,24 +34,27 @@ public class NoteService : INoteService
 
     public async Task<string> CreateNote(string token, CreateNoteRequest createNoteRequest)
     {
-        Token<ObjectId>? parsedToken = _securityService.TryParseToken<ObjectId>(token, _mongoIdentityProvider);
+        Token<ObjectId>? parsedToken = _securityService.TryParseToken(token, _mongoIdentityProvider);
         if (parsedToken == null)
         {
             throw new Exception("Token Invalid");
         }
 
-        User<ObjectId>? authenticatedUser = await _securityService.AuthenticateUser<ObjectId>(parsedToken, _mongoUsersRepository);
+        User<ObjectId>? authenticatedUser = await _securityService.AuthenticateUser(parsedToken, _mongoUsersRepository);
         if (authenticatedUser == null)
         {
             throw new Exception("Could not authenticate the User");
         }
 
         DateTime issued = DateTime.UtcNow;
+        var description = createNoteRequest.Description ?? "";
+        var content = "[{\"type\":\"paragraph\",\"children\":[{\"text\": \"\"}]}]";
         string encriptedName = await _securityService.ChipherData(createNoteRequest.Name!, authenticatedUser.Passphrase, issued.ToString());
-        string encriptedDescription = await _securityService.ChipherData(createNoteRequest.Description!, authenticatedUser.Passphrase, issued.ToString());
-        string encriptedContent = await _securityService.ChipherData(createNoteRequest.Content!, authenticatedUser.Passphrase, issued.ToString());
+        string encriptedDescription = await _securityService.ChipherData(description, authenticatedUser.Passphrase, issued.ToString());
+        string encriptedContent = await _securityService.ChipherData(content, authenticatedUser.Passphrase, issued.ToString());
 
-        Note<ObjectId> note = new Note<ObjectId>(
+
+        Note<ObjectId> note = new(
             _mongoIdentityProvider,
             authenticatedUser.Id,
             encriptedName,
@@ -91,13 +94,13 @@ public class NoteService : INoteService
 
     public async Task<NoteResponse> GetNote(string token, string noteId)
     {
-        Token<ObjectId>? parsedToken = _securityService.TryParseToken<ObjectId>(token, _mongoIdentityProvider);
+        Token<ObjectId>? parsedToken = _securityService.TryParseToken(token, _mongoIdentityProvider);
         if (parsedToken == null)
         {
             throw new Exception("Token Invalid");
         }
 
-        User<ObjectId>? authenticatedUser = await _securityService.AuthenticateUser<ObjectId>(parsedToken, _mongoUsersRepository);
+        User<ObjectId>? authenticatedUser = await _securityService.AuthenticateUser(parsedToken, _mongoUsersRepository);
         if (authenticatedUser == null)
         {
             throw new Exception("Could not authenticate the User");
