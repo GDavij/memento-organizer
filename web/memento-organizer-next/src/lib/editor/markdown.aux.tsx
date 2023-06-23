@@ -47,37 +47,37 @@ export function Element(props: ElementProps) {
       );
     case "heading-1":
       return (
-        <h1 className="text-7xl" {...props.renderProps.attributes}>
+        <h1 className="text-[2.8em] leading-[1.2em]" {...props.renderProps.attributes}>
           {props.renderProps.children}
         </h1>
       );
     case "heading-2":
       return (
-        <h2 className="text-6xl" {...props.renderProps.attributes}>
+        <h2 className="text-[2.4em] leading-[1.2em]" {...props.renderProps.attributes}>
           {props.renderProps.children}
         </h2>
       );
     case "heading-3":
       return (
-        <h3 className="text-5xl" {...props.renderProps.attributes}>
+        <h3 className="text-[2em] leading-[1.2em]" {...props.renderProps.attributes}>
           {props.renderProps.children}
         </h3>
       );
     case "heading-4":
       return (
-        <h4 className="text-4xl" {...props.renderProps.attributes}>
+        <h4 className="text-[1.8em] leading-[1.2em]" {...props.renderProps.attributes}>
           {props.renderProps.children}
         </h4>
       );
     case "heading-5":
       return (
-        <h5 className="text-3xl" {...props.renderProps.attributes}>
+        <h5 className="text-[1.8em] leading-[1.2em]" {...props.renderProps.attributes}>
           {props.renderProps.children}
         </h5>
       );
     case "heading-6":
       return (
-        <h6 className="text-2xl" {...props.renderProps.attributes}>
+        <h6 className="text-[1.8em] leading-[1.2em]" {...props.renderProps.attributes}>
           {props.renderProps.children}
         </h6>
       );
@@ -87,7 +87,7 @@ export function Element(props: ElementProps) {
           className=" list-none h-fit w-fit "
           {...props.renderProps.attributes}
         >
-          <li className="text-emerald-500 text-xl ">
+          <li className="text-emerald-500 text-[1.2em] ">
             {props.renderProps.children}
           </li>
         </ul>
@@ -98,13 +98,13 @@ export function Element(props: ElementProps) {
           className=" list-none h-fit w-fit "
           {...props.renderProps.attributes}
         >
-          <li className="text-emerald-500 text-xl ">
+          <li className="text-emerald-500 text-[1.2em] ">
             {props.renderProps.children}
           </li>
         </ul>
       );
   }
-  return <p {...props.renderProps.attributes}>{props.renderProps.children}</p>;
+  return <p className="text-[1.2em] text-slate-500 dark:text-slate-400" {...props.renderProps.attributes}>{props.renderProps.children}</p>;
 }
 
 export function Leaf({ attributes, children, leaf }: RenderLeafProps) {

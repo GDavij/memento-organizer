@@ -112,6 +112,7 @@ export default function Notes() {
       editorOptionsContext: noteFetched,
     });
     setIsFetchingNote(false);
+   (document.getElementById("dashboard-content-container") as HTMLDivElement).scrollTo({top:0,left:0, behavior: "instant"});
   }
 
   useEffect(() => {

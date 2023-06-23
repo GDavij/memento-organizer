@@ -1,7 +1,6 @@
 export type TCreateNoteRequest = {
   name: string;
-  description: string;
-  content: string;
+  description?: string;
 };
 
 export type TUpdateNoteRequest = {

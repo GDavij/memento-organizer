@@ -7,7 +7,7 @@ import { MdSettings } from "react-icons/md";
 export function TopBar() {
   const { openClose } = useSidebar();
   const { pageDetails } = useTopBar();
-  const { setIsEditingNoteMetadata, noteContent } = useEditor();
+  const { setIsEditingNoteMetadata } = useEditor();
   return (
     <div className="w-screen h-16 bg-emerald-500 drop-shadow-lg px-4 flex justify-between items-center">
       <button onClick={openClose} className="h-full text-4xl text-white">

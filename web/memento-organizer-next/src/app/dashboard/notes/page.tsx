@@ -143,14 +143,14 @@ export default function Notes() {
         </label>
       </div>
 
-      <div className="sm:ml-0 ml-5 w-11/12 h-fit bg-white dark:bg-slate-700 flex gap-4 flex-wrap flex-grow p-4 justify-center drop-shadow-lg">
+      <div className="sm:ml-0 ml-5 w-11/12 h-fit bg-white dark:bg-slate-700 flex gap-4 flex-wrap flex-grow justify-center drop-shadow-lg p-4 rounded-md mb-16">
         {isFetchingNotes ? (
           <Loader loadingText="Fetching notes" />
         ) : filteredNotes.length > 0 ? (
           filteredNotes.map((note) => (
             <div
               key={note.id}
-              className=" w-full xl:w-1/3 h-fit  bg-slate-300 dark:bg-slate-800 p-4 hover:bg-emerald-300 dark:hover:bg-emerald-800 transition-colors duration-500 "
+              className=" w-full xl:w-[32%] h-fit  bg-slate-300 dark:bg-slate-800 p-4 hover:bg-emerald-300 dark:hover:bg-emerald-800 transition-colors duration-500 "
             >
               <Link
                 className="w-full h-full flex flex-col gap-8"
@@ -158,25 +158,25 @@ export default function Notes() {
               >
                 <div className="border-l-2 border-emerald-500 pl-2">
                   <div className="flex justify-between items-center">
-                    <MdAssignment className="inline text-xl" />
-                    <span className="text-lg md:text-2xl w-3/6 md:w-4/6 font-bold flex flex-grow-0 flex-shrink justify-between items-center">
-                      <span className="inline-block max-w-full truncate ">
+                    <MdAssignment className=" w-fit flex flex-shrink flex-grow-0 text-xl" />
+                    <span className="text-lg md:text-xg w-3/6 md:w-4/6 font-bold flex flex-grow-0 flex-shrink justify-between items-center">
+                      <span className="inline-block w-[90%] truncate ">
                         {note.name}
                       </span>
                     </span>
-                    <span className="font-normal text-sm flex items-center gap-2">
-                      {note.issued.slice(0, 10)}{" "}
+                    <span className="font-normal text-sm  flex items-end gap-2">
+                      {note.issued.slice(0, 10)}
                       <MdLockClock className="inline text-xl" />
                     </span>
                   </div>
                   <div>{note.id}</div>
                 </div>
-                <section className="font-light text-md text-slate-500 dark:text-gray-400 p-2 rounded-lg bg-slate-200 dark:bg-slate-700 flex flex-col gap-4">
-                  <div className="h-16">
+                <section className="font-light text-md text-slate-500 dark:text-gray-400 p-2 pb-4 rounded-lg bg-slate-200 dark:bg-slate-700 flex flex-col gap-4">
+                  <div className="h-16 truncate">
                     <h3 className="font-bold">Description</h3>
-                    <span className="truncate">{note.description}</span>
+                    <span className="overflow-hidden">{note.description != "" ? note.description : "No Description, Add One!"}</span>
                   </div>
-                  <div className="h-24">
+                  <div className="h-24 border-l-2 border-emerald-500 pl-1">
                     <h3 className="font-bold">Content</h3>
                     <article className="truncate h-[80%] ">
                       {renderElementDisabled(note)}

@@ -13,8 +13,7 @@ import { BaseEditor, Descendant, createEditor } from "slate";
 
 type TCreateNoteFormData = {
   name: string;
-  description: string;
-  content: Descendant[];
+  description?: string;
 };
 
 export default function CreateNoteModal({ open, onClose }: BaseModalProps) {
@@ -23,15 +22,9 @@ export default function CreateNoteModal({ open, onClose }: BaseModalProps) {
     register,
     handleSubmit,
     reset,
-    getValues,
-    setValue,
     formState: { errors },
   } = useForm<TCreateNoteFormData>();
 
-  const editor = useMemo(() => withReact(createEditor()), []);
-  const [noteContent, setNoteContent] = useState<Descendant[]>([
-    { children: [{ text: "My Note Content" }], type: "paragraph" },
-  ]);
 
   const [isCreating, setIsCreating] = useState(false);
   useEffect(() => {
@@ -40,20 +33,10 @@ export default function CreateNoteModal({ open, onClose }: BaseModalProps) {
   }, [open]);
 
   async function handleNoteCreation(formData: TCreateNoteFormData) {
-    if (formData.name.length < 4) {
-      toast.error("Name does not have the minimum length of 4");
-      return;
-    }
-
-    if (formData.description.length < 8) {
-      toast.error("Description does not have the minimum length of 8");
-      return;
-    }
-
+    console.log(formData);
     const filteredBody: TCreateNoteRequest = {
       name: formData.name,
-      description: formData.description,
-      content: JSON.stringify(formData.content),
+      description: formData.description !=  "" ? formData.description : undefined
     };
     setIsCreating(true);
     const noteId = await notesService.createNote(filteredBody);
@@ -83,41 +66,16 @@ export default function CreateNoteModal({ open, onClose }: BaseModalProps) {
           {errors.name?.type == "required" && (
             <div className="text-red-500">Name is Required</div>
           )}
-          {errors.name?.type == "minLength" && (
-            <div className="text-red-500">
-              Name must have a minimum Length of 4
-            </div>
-          )}
         </label>
         <label className="w-full">
-          Description*
+          Description
           <input
             readOnly={isCreating}
-            {...register("description", { required: true, minLength: 8 })}
+            {...register("description")}
             type="text"
             className="w-full h-8 bg-slate-300 dark:bg-slate-800 outline-none p-6 text-base rounded-md"
           />
-          {errors.description?.type == "required" && (
-            <div className="text-red-500">Description is Required</div>
-          )}
-          {errors.description?.type == "minLength" && (
-            <div className="text-red-500">
-              Description must have a minimum Length of 8
-            </div>
-          )}
-        </label>
-        <label className="w-full">
-          Content
-          <Slate
-            onChange={(value) => setValue("content", value as Descendant[])}
-            editor={editor}
-            value={noteContent}
-          >
-            <Editable className="w-full h-fit flex items-center justify-start bg-slate-300 dark:bg-slate-800 outline-none p-4 text-base rounded-md" />
-          </Slate>
-          {errors.content?.type == "required" && (
-            <div className="text-red-500">Content is Required</div>
-          )}
+         
         </label>
         <button
           disabled={isCreating}
