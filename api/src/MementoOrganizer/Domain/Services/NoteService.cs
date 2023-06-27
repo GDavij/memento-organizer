@@ -164,6 +164,10 @@ public class NoteService : INoteService
         {
             note.Description = await _securityService.ChipherData(updateNoteRequest.Description, authenticatedUser.Passphrase, note.Issued.ToString());
         }
+        else if (updateNoteRequest.Content == null)
+        {
+            note.Description = await _securityService.ChipherData("", authenticatedUser.Passphrase, note.Issued.ToString());
+        }
 
         if (updateNoteRequest.Content != null)
         {

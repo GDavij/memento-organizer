@@ -33,7 +33,6 @@ export default function CreateNoteModal({ open, onClose }: BaseModalProps) {
   }, [open]);
 
   async function handleNoteCreation(formData: TCreateNoteFormData) {
-    console.log(formData);
     const filteredBody: TCreateNoteRequest = {
       name: formData.name,
       description: formData.description !=  "" ? formData.description : undefined
