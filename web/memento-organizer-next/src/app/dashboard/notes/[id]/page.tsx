@@ -183,7 +183,7 @@ export default function Notes() {
               className={`grid place-content-center text-xl ${
                 editorContext.isBold ? "text-emerald-500" : ""
               }
-              }`}
+              `}
             >
               <MdFormatBold />
             </button>
