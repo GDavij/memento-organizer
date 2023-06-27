@@ -3,9 +3,7 @@ import {
   MdAssignment,
   MdAssignmentAdd,
   MdAutorenew,
-  MdClose,
   MdLockClock,
-  MdOutlineSquare,
 } from "react-icons/md";
 import { Note } from "@/models/data/note";
 import { useEffect, useId, useState } from "react";
@@ -16,9 +14,7 @@ import Loader from "@/app/components/Loader";
 import { useForm } from "react-hook-form";
 import CreateNoteModal from "./components/CreateNoteModal";
 import { useTopBar } from "../contexts/useTopBar";
-import { TBaseNoteData } from "@/models/data/editorTypes";
-import { renderElement, renderElementDisabled } from "@/lib/editor/markdown.aux";
-import { render } from "react-dom";
+import { renderElementDisabled } from "@/lib/editor/markdown.aux";
 export default function Notes() {
   const { setPageDetails } = useTopBar();
 
@@ -189,18 +185,27 @@ export default function Notes() {
               </Link>
             </div>
           ))
-        ) : (
+        ) : notes.length == 0  ? (
           <section className="w-full h-full flex flex-col gap-2 items-center justify-center">
             <h1 className=" text-lg md:text-4xl">
               You Don&apos;t have any Notes Yet
             </h1>
             <article className=" text-sm md:text-lg  font-light text-slate-500 dark:text-gray-100">
-              Create your first note by clicking in the &quot;Create New Note{" "}
+              Create your first note by clicking in the Create New Note{" "}
               <MdAssignmentAdd className="inline text-lg" />
               &quot; Button
             </article>
           </section>
-        )}
+        ) : (<section className="w-full h-full flex flex-col gap-2 items-center justify-center overflow-clip text-ellipsis">
+        <h1 className=" text-lg md:text-4xl ">
+          We Don&apos;t find any notes while searching for a {watch("filterType")} 
+        </h1>
+        <article className="text-sm md:text-lg flex items-end justify-center  whitespace-nowrap font-light text-slate-500 dark:text-gray-100">
+          The filter  &ldquo;
+          <span className="h-fit max-w-[50cqw] overflow-hidden text-ellipsis inline-block">{watch("filterData")}</span>
+          &rdquo; Don&lsquo;t find any notes
+        </article>
+      </section> )}
       </div>
       <ToastContainer />
       <CreateNoteModal

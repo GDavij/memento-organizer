@@ -28,8 +28,6 @@ import { useEditor } from "../contexts/editor/useEditor";
 import Loader from "@/app/components/Loader";
 import { TBaseNoteData, hotKeys } from "@/models/data/editorTypes";
 import {
-  Leaf,
-  TextEditorImage,
   renderElement,
   renderLeaf,
 } from "@/lib/editor/markdown.aux";
@@ -37,8 +35,6 @@ import {
   withImagesFromFiles,
   withMarkdown,
 } from "@/lib/editor/editorExtensions.setup";
-import { Element } from "@/lib/editor/markdown.aux";
-import { renderMarkdown } from "@/lib/editor/renderer";
 
 type TEditorScreenProps = {
   initialNoteContent: Descendant[];
@@ -90,7 +86,7 @@ export function EditorScreen({
         const isItalicMark = isMarkActive(editor, "italic");
         const isUnderlineMark = isMarkActive(editor, "underline");
 
-        const focusLine = editor.selection!.focus.path[0];
+        const focusLine = editor.selection?.focus!.path[0] || 0;
         const dataType = (value as TBaseNoteData[])[focusLine].type;
         if (noteType != dataType) {
           setNoteType(dataType);
