@@ -119,4 +119,40 @@ public class UserService : IUserService
 
         return _securityService.GenerateToken<ObjectId>(databaseUser.Id, databaseUser.Passphrase);
     }
+
+    public async Task<bool> UpdateUser(string token, UpdateUserRequest updateUserRequest)
+    {
+        if (
+            updateUserRequest.Email is not null &&
+            await _mongoUsersRepository.FindUserByEmail(updateUserRequest.Email) != null)
+        {
+            throw new Exception("Could not Update User Email, already Exists");
+        }
+
+        Token<ObjectId>? parsedToken = _securityService.TryParseToken(token, _mongoIdentityProvider);
+        if (parsedToken == null)
+        {
+            throw new Exception("Token is Not Valid");
+        }
+
+        User<ObjectId>? authenticatedUser = await _securityService.AuthenticateUser(parsedToken, _mongoUsersRepository);
+        if (authenticatedUser == null)
+        {
+            throw new Exception("Token is not Valid");
+        }
+
+        if (updateUserRequest.Email != null)
+        {
+            authenticatedUser.Email = updateUserRequest.Email;
+        }
+
+        if (updateUserRequest.Passphrase != null)
+        {
+            var derivedPassphrase = _securityService.DerivePassphrase(updateUserRequest.Passphrase, authenticatedUser.Issued.ToString());
+            authenticatedUser.Passphrase = derivedPassphrase;
+        }
+
+        bool hasBeenUpdated = await _mongoUsersRepository.ReplaceUser(authenticatedUser.Id, authenticatedUser);
+        return hasBeenUpdated;
+    }
 }

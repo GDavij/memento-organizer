@@ -53,4 +53,12 @@ public class MongoUsersRepository : IUsersRepository<ObjectId>
         await _usersCollection.InsertOneAsync(user);
         return;
     }
+
+    public async Task<bool> ReplaceUser(ObjectId ownerId, User<ObjectId> user)
+    {
+        var filter = Builders<User<ObjectId>>.Filter.Eq(User => User.Id, ownerId);
+        var query = _usersCollection.ReplaceOneAsync(filter, user);
+        await query;
+        return query.IsCompletedSuccessfully;
+    }
 }

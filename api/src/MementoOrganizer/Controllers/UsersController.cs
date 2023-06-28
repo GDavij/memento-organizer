@@ -36,14 +36,22 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> LoginUser([FromBody()] LoginUserRequest loginUserRequest)
     {
         string token = await _userService.LoginUser(loginUserRequest);
-        return Ok(new { token = token });
+        return Ok(new { token });
     }
 
     [HttpDelete]
     [Route("delete/{token}")]
-    public async Task<IActionResult> Deleteuser([FromRoute()] string token)
+    public async Task<IActionResult> DeleteUser([FromRoute()] string token)
     {
         bool hasBeenDeleted = await _userService.DeleteUser(token);
         return Ok(hasBeenDeleted);
+    }
+
+    [HttpPut]
+    [Route("update/{token}")]
+    public async Task<IActionResult> UpdateUser([FromRoute()] string token, [FromBody()] UpdateUserRequest updateUserRequest)
+    {
+        bool hasBeenUpdated = await _userService.UpdateUser(token, updateUserRequest);
+        return Ok(hasBeenUpdated);
     }
 }

@@ -6,7 +6,7 @@ public interface IUserService
 {
     public Task CreateAdmin(CreateAdminRequest createAdminRequest);
     public Task CreateUser(CreateUserRequest createUserRequest);
-    //TODO: Create a UpdateUser Method (Via Atomic Update) 
-    public Task<bool> DeleteUser(string token); //? Maybe it can just return Task instead of Task<bool>
+    public Task<bool> DeleteUser(string token);
     public Task<string> LoginUser(LoginUserRequest loginUserRequest);
+    public Task<bool> UpdateUser(string token, UpdateUserRequest updateUserRequest);
 }
