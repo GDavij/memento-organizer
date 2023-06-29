@@ -1,5 +1,7 @@
 using System;
 using MementoOrganizer.Domain.Providers;
+using MementoOrganizer.Domain.Services.Interfaces;
+
 namespace MementoOrganizer.Domain.Entities;
 
 public class User<TId>
@@ -9,6 +11,7 @@ public class User<TId>
     public string Passphrase { get; set; }
     public DateTime Issued { get; private set; }
     public DateTime LastLogin { get; set; }
+    public string EncryptionKey { get; private set; }
     public bool IsAdmin { get; private set; }
 
     public User(
@@ -16,6 +19,7 @@ public class User<TId>
         string email,
         string derivedPassphrase,
         DateTime issued,
+        ISecurityService securityService,
         bool isAdmin
         )
     {
@@ -24,6 +28,7 @@ public class User<TId>
         Passphrase = derivedPassphrase;
         Issued = issued;
         LastLogin = issued;
+        EncryptionKey = securityService.DerivePassphrase(Id!.ToString()!, Issued.ToString());
         IsAdmin = isAdmin;
     }
 }

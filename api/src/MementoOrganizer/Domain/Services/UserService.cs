@@ -50,7 +50,6 @@ public class UserService : IUserService
                 throw new Exception("Admin Already Exists Create a new Admin with an Admin Token");
             }
         }
-
         DateTime issued = DateTime.UtcNow;
         string derivedPassphrase = _securityService.DerivePassphrase(createAdminRequest.Passphrase!, issued.ToString());
 
@@ -59,6 +58,7 @@ public class UserService : IUserService
             createAdminRequest.Email!,
             derivedPassphrase,
             issued,
+            _securityService,
             true);
 
         await _mongoUsersRepository.InsertUser(newUser);
@@ -81,6 +81,7 @@ public class UserService : IUserService
             createUserRequest.Email!,
             derivedPassphrase,
             issued,
+            _securityService,
             false);
 
         await _mongoUsersRepository.InsertUser(user);
