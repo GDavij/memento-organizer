@@ -62,7 +62,7 @@ export default function Login() {
               {...register("email", { required: true })}
               type="email"
               id={emailInputId}
-              className="w-full h-8 bg-slate-300 dark:bg-slate-800 outline-none p-6 text-base rounded-md"
+              className="input-flat"
             />
             {errors.email && (
               <span className="text-red-500">Email is Required</span>
@@ -71,7 +71,7 @@ export default function Login() {
 
           <label htmlFor={passphraseInputId}>
             Passphrase
-            <div className=" bg-slate-300 dark:bg-slate-800 text-base rounded-md flex items-center pr-5">
+            <div className="input-wrapper-left-flat">
               <input
                 {...register("passphrase", { required: true, minLength: 16 })}
                 type="password"
@@ -91,7 +91,7 @@ export default function Login() {
           </label>
 
           <button
-            className="p-4 bg-emerald-500 text-white rounded-2xl shadow-black drop-shadow-sm hover:bg-slate-300 hover:text-emerald-600 transition-all hover:drop-shadow-none dark:hover:bg-slate-600 text-lg flex items-center justify-center h-16 disabled:cursor-not-allowed"
+            className="h-16 p-4 button-flat"
             disabled={isLoging}
           >
             {isLoging ? (

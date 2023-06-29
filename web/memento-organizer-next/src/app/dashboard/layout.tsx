@@ -24,7 +24,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <TopBar />
       <div className="w-full h-full flex flex-shrink flex-grow-0 overflow-auto">
         <NavigationBar hidden={open} />
-        <div id="dashboard-content-container" className=" w-full h-full flex flex-col items-center pt-8 overflow-auto scroll-smooth">
+        <div id="dashboard-content-container" className=" w-full h-full flex flex-col items-center p-4 overflow-auto scroll-smooth">
           {children}
         </div>
       </div>

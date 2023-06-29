@@ -7,6 +7,8 @@ using MementoOrganizer.Domain.Models.Data;
 using System.Threading.Tasks;
 using MementoOrganizer.Domain.Models.Requests.Users;
 using System;
+using MementoOrganizer.Domain.Models.Responses.Users;
+using MementoOrganizer.Domain.Extensions;
 
 namespace MementoOrganizer.Domain.Services;
 
@@ -103,6 +105,40 @@ public class UserService : IUserService
         return hasBeenDeleted;
     }
 
+    public async Task<UserResponse> FindUser(string token)
+    {
+        Token<ObjectId>? parsedToken = _securityService.TryParseToken(token, _mongoIdentityProvider);
+        if (parsedToken == null)
+        {
+            throw new Exception("Token is not Valid");
+        }
+
+        User<ObjectId>? authenticatedUser = await _securityService.AuthenticateUser(parsedToken, _mongoUsersRepository);
+        if (authenticatedUser == null)
+        {
+            throw new Exception("Token is not Valid");
+        }
+
+        return authenticatedUser.ToUserResponse<ObjectId>();
+    }
+
+    public async Task<bool> CheckIsAdmin(string token)
+    {
+        Token<ObjectId>? parsedToken = _securityService.TryParseToken(token, _mongoIdentityProvider);
+        if (parsedToken == null)
+        {
+            throw new Exception("Token is not Valid");
+        }
+
+        User<ObjectId>? authenticatedUser = await _securityService.AuthenticateUser(parsedToken, _mongoUsersRepository);
+        if (authenticatedUser == null)
+        {
+            throw new Exception("Token is not Valid");
+        }
+
+        return authenticatedUser.IsAdmin;
+    }
+
     public async Task<string> LoginUser(LoginUserRequest loginUserRequest)
     {
         User<ObjectId>? databaseUser = await _mongoUsersRepository.FindUserByEmail(loginUserRequest.Email!);
@@ -120,7 +156,7 @@ public class UserService : IUserService
         return _securityService.GenerateToken<ObjectId>(databaseUser.Id, databaseUser.Passphrase);
     }
 
-    public async Task<bool> UpdateUser(string token, UpdateUserRequest updateUserRequest)
+    public async Task<string> UpdateUser(string token, UpdateUserRequest updateUserRequest)
     {
         if (
             updateUserRequest.Email is not null &&
@@ -153,6 +189,11 @@ public class UserService : IUserService
         }
 
         bool hasBeenUpdated = await _mongoUsersRepository.ReplaceUser(authenticatedUser.Id, authenticatedUser);
-        return hasBeenUpdated;
+        if (hasBeenUpdated)
+        {
+            return _securityService.GenerateToken(authenticatedUser.Id, authenticatedUser.Passphrase);
+        }
+
+        throw new Exception("Could not Update user");
     }
 }

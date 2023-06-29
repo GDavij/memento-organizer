@@ -9,7 +9,7 @@ export function TopBar() {
   const { pageDetails } = useTopBar();
   const { setIsEditingNoteMetadata } = useEditor();
   return (
-    <div className="w-screen h-16 bg-emerald-500 drop-shadow-lg px-4 flex justify-between items-center">
+    <div className="w-screen h-16 bg-emerald-500 drop-shadow-lg px-4 flex flex-grow-0 flex-shrink-0 justify-between items-center">
       <button onClick={openClose} className="h-full text-4xl text-white">
         <MdViewHeadline />
       </button>

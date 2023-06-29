@@ -39,8 +39,7 @@ public static class ConvertionExtensions
         {
             noteResponses.Add(await note);
         }
-        //! It Works But Probaly it is not the best solution at really
-        //TODO: Find a Better Way to Transform the Data in an async way
+
         return noteResponses;
     }
 }
