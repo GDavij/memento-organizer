@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import CreateNoteModal from "./components/CreateNoteModal";
 import { useTopBar } from "../contexts/useTopBar";
 import { renderElementDisabled } from "@/lib/editor/markdown.aux";
+
 export default function Notes() {
   const { setPageDetails } = useTopBar();
 

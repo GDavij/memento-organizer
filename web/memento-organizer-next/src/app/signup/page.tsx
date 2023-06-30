@@ -5,7 +5,6 @@ import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdOutlineSquare } from "react-icons/md";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.min.css";
 
 type TSignUpFormData = {
   email: string;

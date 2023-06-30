@@ -1,9 +1,10 @@
 "use client"
-import { MdHome, MdArticle, MdAccountBox } from "react-icons/md";
+import { MdHome, MdArticle, MdAccountBox, MdExitToApp } from "react-icons/md";
 import { ReactElement, useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSidebar } from "../contexts/useSidebar";
+import ConfirmDialog from "@/app/components/ConfirmDialog";
 
 type TNavigationMenu = {
   href: string;
@@ -26,7 +27,10 @@ const routes: TNavigationMenu[] = [
 
 export function NavigationBar({ hidden }: { hidden: boolean }) {
   const path = usePathname();
+  const router = useRouter();
   const { openClose } = useSidebar();
+  const [openExitDialog, setOpenExitDialog] = useState(false);
+
   return (
     <>
     <button
@@ -50,7 +54,7 @@ export function NavigationBar({ hidden }: { hidden: boolean }) {
             className="w-full h-16 bg-slate-300 dark:bg-slate-800 rounded-lg"
             >
             <Link
-              href={"dashboard/" + route.href}
+              href={"/dashboard/" + route.href}
               onClick={() => {
                 if (window.innerWidth <= 640) {
                   openClose();
@@ -68,14 +72,30 @@ export function NavigationBar({ hidden }: { hidden: boolean }) {
           </li>
         ))}
       </ul>
-      <Link href="/dashboard/user/config" className={` bg-slate-300 dark:bg-slate-800 hover:bg-emerald-500 transition-all w-full h-fit mb-4 flex  items-center pr-6 py-4
-       ${ hidden && "hidden"}`}>
-         <div  className=" w-full h-full flex  items-center justify-end">
+      <div  className={`hover:bg-emerald-500 transition-all w-full h-fit mb-4 flex  items-center 
+       ${ hidden && "hidden"} ${"/dashboard/user/config" == path ? "bg-emerald-500 text-white" : "bg-slate-300 dark:bg-slate-800"}`}>
+        <div className="flex w-fit h-full items-center justify-center ml-8">
+          <button className="button-flat-inverse p-4" onClick={() => setOpenExitDialog(true)}>
+            <MdExitToApp/>
+          </button>
+        </div> 
+        <Link href="/dashboard/user/config" className=" w-full h-full flex  items-center justify-end py-4 pr-2">
           <span className="text-lg">USER</span>
           <MdAccountBox className="text-4xl"/>
-        </div>
-      </Link>
+        </Link>
+      </div>
     </nav>
+    <ConfirmDialog 
+        open={openExitDialog} 
+        onClose={() => setOpenExitDialog(false)} 
+        title="Leave system"
+        question="are u sure about leave the system?"
+        declineButtonContent="No, keep"
+        okayButtonContent="Yes, exit"
+        onOkay={async () => {
+          localStorage.clear();
+          router.replace("/");
+        }}/>
   </>
   );
 }

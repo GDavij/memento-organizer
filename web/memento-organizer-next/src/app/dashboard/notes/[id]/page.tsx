@@ -62,6 +62,7 @@ import { Note, TBaseNoteData, TNoteTypes } from "@/models/data/editorTypes";
 import { useEditor } from "../../contexts/editor/useEditor";
 import { isMarkActive, toggleMark } from "@/lib/editor/editor.aux";
 import { EditorScreen } from "../../components/editor";
+
 const removeLastHeading = (text: string, lastHeading: TNoteTypes) => {
   switch (lastHeading) {
     case "heading-1":

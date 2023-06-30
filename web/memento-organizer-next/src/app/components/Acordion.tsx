@@ -18,6 +18,6 @@ export function Accordion({children, open, closeOpen, subject, height}:Accordion
         </span>
        <span className="text-lg font-bold duration-150">{subject}</span> 
      </button>
-    <article className={`px-4 flex flex-col transition-[height, margin-top] duration-200 ${open ? `${height} mt-8` : "h-0"} overflow-hidden`}>{children}</article>
+    <article className={`px-4 flex flex-col transition-[height, margin-top] duration-200 ${open ? `${height} mt-2` : "h-0"} overflow-hidden`}>{children}</article>
     </section>)
 }
