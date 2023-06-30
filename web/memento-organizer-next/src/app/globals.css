@@ -42,7 +42,7 @@ body {
   }
 
   .button-flat-inverse {
-    @apply  bg-white text-emerald-600 transition-all hover:drop-shadow-none dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-900 hover:text-inherit rounded-md shadow-black drop-shadow-sm  text-lg flex items-center justify-center  disabled:cursor-not-allowed;
+    @apply  bg-white text-emerald-600 transition-all hover:drop-shadow-none dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-900 hover:text-inherit rounded-md shadow-black drop-shadow-sm  text-lg flex items-center justify-center  disabled:cursor-not-allowed;
   }
 
   .button-danger-flat {

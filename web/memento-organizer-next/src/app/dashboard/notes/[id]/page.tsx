@@ -54,9 +54,7 @@ import {
   Slate,
   withReact,
 } from "slate-react";
-import { BaseEditor, Element as SlateElement, Node as SlateNode } from "slate";
 import { ReactEditor } from "slate-react";
-
 import { useTopBar } from "../../contexts/useTopBar";
 import { Note, TBaseNoteData, TNoteTypes } from "@/models/data/editorTypes";
 import { useEditor } from "../../contexts/editor/useEditor";
@@ -113,7 +111,8 @@ export default function Notes() {
       editorOptionsContext: noteFetched,
     });
     setIsFetchingNote(false);
-   (document.getElementById("dashboard-content-container") as HTMLDivElement).scrollTo({top:0,left:0, behavior: "instant"});
+    const scrollToOptions = { top: 0, left: 0, behavior: 'instant' };
+    (document.getElementById("dashboard-content-container") as HTMLDivElement).scroll(scrollToOptions as unknown as ScrollToOptions);
   }
 
   useEffect(() => {

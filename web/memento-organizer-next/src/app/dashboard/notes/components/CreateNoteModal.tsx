@@ -58,7 +58,7 @@ export default function CreateNoteModal({ open, onClose }: BaseModalProps) {
           Note Name*
           <input
             readOnly={isCreating}
-            {...register("name", { required: true, minLength: 4 })}
+            {...register("name", { required: true })}
             type="text"
             className="w-full h-8 bg-slate-300 dark:bg-slate-800 outline-none p-6 text-base rounded-md"
           />
