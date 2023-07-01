@@ -27,3 +27,26 @@ body {
   flex-grow: 0;
   flex-shrink: 1;
 }
+
+@layer components {
+  .input-flat {
+    @apply w-full h-8 bg-slate-300 dark:bg-slate-800 outline-none p-6 text-base rounded-md;
+  }
+
+  .input-wrapper-left-flat {
+    @apply bg-slate-300 dark:bg-slate-800 text-base rounded-md flex items-center pr-5;
+  }
+  
+  .button-flat {
+    @apply  bg-emerald-500 text-white rounded-2xl shadow-black drop-shadow-sm hover:bg-slate-300 hover:text-emerald-600 transition-all hover:drop-shadow-none dark:hover:bg-slate-600 text-lg flex items-center justify-center  disabled:cursor-not-allowed;
+  }
+
+  .button-flat-inverse {
+    @apply  bg-white text-emerald-600 transition-all hover:drop-shadow-none dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-900 hover:text-inherit rounded-md shadow-black drop-shadow-sm  text-lg flex items-center justify-center  disabled:cursor-not-allowed;
+  }
+
+  .button-danger-flat {
+    @apply bg-red-500 text-white rounded-2xl shadow-black drop-shadow-sm hover:bg-slate-300 hover:text-red-600 transition-all hover:drop-shadow-none dark:hover:bg-slate-600 text-lg flex items-center justify-center  disabled:cursor-not-allowed;
+  }
+  
+}

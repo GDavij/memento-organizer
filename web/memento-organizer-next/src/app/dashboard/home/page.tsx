@@ -1,8 +1,15 @@
-"use-client";
+"use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
+import { useTopBar } from "../contexts/useTopBar";
 
 export default function Home() {
+  const { setPageDetails } = useTopBar();
+  useEffect(() => {
+    setPageDetails({ pageName: "Home" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <>
       <div className="sm:ml-0 ml-5 w-11/12  bg-white dark:bg-slate-700 px-2 py-4 sm:p-8 flex flex-col mb-8">

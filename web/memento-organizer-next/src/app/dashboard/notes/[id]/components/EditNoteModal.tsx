@@ -14,11 +14,15 @@ import { Note } from "@/models/data/note";
 import Loader from "@/app/components/Loader";
 import { MdDelete } from "react-icons/md";
 
+type TEditNoteFormData = {
+  name: string;
+  description?: string;
+};
 interface EditNoteModalProps extends BaseModalProps {
   id: string;
   refetchNoteCb: () => Promise<void>;
 }
-export default function CreateNoteModal({
+export default function EditNoteModal({
   open,
   onClose,
   id,
@@ -29,7 +33,7 @@ export default function CreateNoteModal({
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<TCreateNoteRequest>();
+  } = useForm<TEditNoteFormData>();
 
   const router = useRouter();
   const [note, setNote] = useState<Note | null>(null);
@@ -51,20 +55,10 @@ export default function CreateNoteModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  async function handleNoteEdition(formData: TCreateNoteRequest) {
-    if (formData.name.length < 4) {
-      toast.error("Name does not have the minimum length of 4");
-      return;
-    }
-
-    if (formData.description.length < 8) {
-      toast.error("Description does not have the minimum length of 8");
-      return;
-    }
-
+  async function handleNoteEdition(formData: TEditNoteFormData) {
     const filteredBody: TUpdateNoteRequest = {
       name: formData.name,
-      description: formData.description,
+      description: formData.description != "" ? formData.description : undefined,
     };
     setIsSaving(true);
     await notesService.updateNote(id, filteredBody);
@@ -106,7 +100,7 @@ export default function CreateNoteModal({
               Note Name*
               <input
                 readOnly={isSaving}
-                {...register("name", { required: true, minLength: 4 })}
+                {...register("name", { required: true})}
                 type="text"
                 className="w-full h-8 bg-slate-300 dark:bg-slate-800 outline-none p-6 text-base rounded-md"
               />
@@ -120,10 +114,10 @@ export default function CreateNoteModal({
               )}
             </label>
             <label className="w-full">
-              Description*
+              Description
               <input
                 readOnly={isSaving}
-                {...register("description", { required: true, minLength: 8 })}
+                {...register("description")}
                 type="text"
                 className="w-full h-8 bg-slate-300 dark:bg-slate-800 outline-none p-6 text-base rounded-md"
               />

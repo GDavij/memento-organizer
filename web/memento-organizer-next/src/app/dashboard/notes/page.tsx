@@ -3,9 +3,7 @@ import {
   MdAssignment,
   MdAssignmentAdd,
   MdAutorenew,
-  MdClose,
   MdLockClock,
-  MdOutlineSquare,
 } from "react-icons/md";
 import { Note } from "@/models/data/note";
 import { useEffect, useId, useState } from "react";
@@ -15,7 +13,12 @@ import { ToastContainer, toast } from "react-toastify";
 import Loader from "@/app/components/Loader";
 import { useForm } from "react-hook-form";
 import CreateNoteModal from "./components/CreateNoteModal";
+import { useTopBar } from "../contexts/useTopBar";
+import { renderElementDisabled } from "@/lib/editor/markdown.aux";
+
 export default function Notes() {
+  const { setPageDetails } = useTopBar();
+
   type TFilterOptions =
     | "Id"
     | "Name"
@@ -71,13 +74,13 @@ export default function Notes() {
   async function fetchNotes() {
     setIsFetchingNotes(true);
     const aux = await notesService.getNotesByOwner();
-    console.log(aux);
     setNotes(aux);
     setFilteredNotes(aux.filter(filterSearch));
     setIsFetchingNotes(false);
     toast.success("Notes fetched with sucess");
   }
   useEffect(() => {
+    setPageDetails({ pageName: "Notes List" });
     fetchNotes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -137,14 +140,14 @@ export default function Notes() {
         </label>
       </div>
 
-      <div className="sm:ml-0 ml-5 w-11/12 h-fit bg-white dark:bg-slate-700 flex gap-4 flex-wrap flex-grow p-4 justify-center drop-shadow-lg">
+      <div className="sm:ml-0 ml-5 w-11/12 h-fit bg-white dark:bg-slate-700 flex gap-4 flex-wrap flex-grow justify-center drop-shadow-lg p-4 rounded-md mb-16">
         {isFetchingNotes ? (
           <Loader loadingText="Fetching notes" />
         ) : filteredNotes.length > 0 ? (
           filteredNotes.map((note) => (
             <div
               key={note.id}
-              className=" w-full xl:w-1/3 h-80 bg-slate-300 dark:bg-slate-800 p-4 hover:bg-emerald-300 dark:hover:bg-emerald-800 transition-colors duration-500 "
+              className=" w-full xl:w-[32%] h-fit  bg-slate-300 dark:bg-slate-800 p-4 hover:bg-emerald-300 dark:hover:bg-emerald-800 transition-colors duration-500 "
             >
               <Link
                 className="w-full h-full flex flex-col gap-8"
@@ -152,27 +155,29 @@ export default function Notes() {
               >
                 <div className="border-l-2 border-emerald-500 pl-2">
                   <div className="flex justify-between items-center">
-                    <MdAssignment className="inline text-xl" />
-                    <span className="text-lg md:text-2xl w-3/6 md:w-4/6 font-bold flex flex-grow-0 flex-shrink justify-between items-center">
-                      <span className="inline-block max-w-full truncate ">
+                    <MdAssignment className=" w-fit flex flex-shrink flex-grow-0 text-xl" />
+                    <span className="text-lg md:text-xg w-3/6 md:w-4/6 font-bold flex flex-grow-0 flex-shrink justify-between items-center">
+                      <span className="inline-block w-[90%] truncate ">
                         {note.name}
                       </span>
                     </span>
-                    <span className="font-normal text-sm flex items-center gap-2">
-                      {note.issued.slice(0, 10)}{" "}
+                    <span className="font-normal text-sm  flex items-end gap-2">
+                      {note.issued.slice(0, 10)}
                       <MdLockClock className="inline text-xl" />
                     </span>
                   </div>
                   <div>{note.id}</div>
                 </div>
-                <section className="font-light text-md text-slate-500 dark:text-gray-400 p-2 rounded-lg bg-slate-200 dark:bg-slate-700 flex flex-col gap-4">
-                  <div className="h-12">
+                <section className="font-light text-md text-slate-500 dark:text-gray-400 p-2 pb-4 rounded-lg bg-slate-200 dark:bg-slate-700 flex flex-col gap-4">
+                  <div className="h-16 truncate">
                     <h3 className="font-bold">Description</h3>
-                    <span className="truncate">{note.description}</span>
+                    <span className="overflow-hidden">{note.description != "" ? note.description : "No Description, Add One!"}</span>
                   </div>
-                  <div className="h-12">
+                  <div className="h-24 border-l-2 border-emerald-500 pl-1">
                     <h3 className="font-bold">Content</h3>
-                    <article className="truncate">{note.content}</article>
+                    <article className="truncate h-[80%] ">
+                      {renderElementDisabled(note)}
+                    </article>
                   </div>
                 </section>
                 <section className="bottom-0 font-light text-md text-slate-500 dark:text-gray-400 p-2 rounded-lg bg-slate-200 dark:bg-slate-700">
@@ -181,18 +186,27 @@ export default function Notes() {
               </Link>
             </div>
           ))
-        ) : (
+        ) : notes.length == 0  ? (
           <section className="w-full h-full flex flex-col gap-2 items-center justify-center">
             <h1 className=" text-lg md:text-4xl">
               You Don&apos;t have any Notes Yet
             </h1>
             <article className=" text-sm md:text-lg  font-light text-slate-500 dark:text-gray-100">
-              Create your first note by clicking in the &quot;Create New Note{" "}
+              Create your first note by clicking in the Create New Note{" "}
               <MdAssignmentAdd className="inline text-lg" />
               &quot; Button
             </article>
           </section>
-        )}
+        ) : (<section className="w-full h-full flex flex-col gap-2 items-center justify-center overflow-clip text-ellipsis">
+        <h1 className=" text-lg md:text-4xl ">
+          We Don&apos;t find any notes while searching for a {watch("filterType")} 
+        </h1>
+        <article className="text-sm md:text-lg flex items-end justify-center  whitespace-nowrap font-light text-slate-500 dark:text-gray-100">
+          The filter  &ldquo;
+          <span className="h-fit max-w-[50cqw] overflow-hidden text-ellipsis inline-block">{watch("filterData")}</span>
+          &rdquo; Don&lsquo;t find any notes
+        </article>
+      </section> )}
       </div>
       <ToastContainer />
       <CreateNoteModal

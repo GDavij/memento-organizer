@@ -50,6 +50,7 @@ public static class SetupApplicationExtensionMethod
             .AddScoped<IValidator<CreateAdminRequest>, CreateAdminRequestValidator>()
             .AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValidator>()
             .AddScoped<IValidator<LoginUserRequest>, LoginUserRequestValidator>()
+            .AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>()
             .AddScoped<IValidator<CreateNoteRequest>, CreateNoteRequestValidator>()
             .AddFluentValidationAutoValidation();
 

@@ -12,9 +12,9 @@ public static class ConvertionExtensions
     public async static Task<NoteResponse> ToNoteResponse<TId>(this Note<TId> note, User<TId> user, ISecurityService securityService)
     {
 
-        Task<string> nameTask = securityService.DechipherData(note.Name, user.Passphrase, note.Issued.ToString());
-        Task<string> descriptionTask = securityService.DechipherData(note.Description, user.Passphrase, note.Issued.ToString());
-        Task<string> contentTask = securityService.DechipherData(note.Content, user.Passphrase, note.Issued.ToString());
+        Task<string> nameTask = securityService.DechipherData(note.Name, user.EncryptionKey, note.Issued.ToString());
+        Task<string> descriptionTask = securityService.DechipherData(note.Description, user.EncryptionKey, note.Issued.ToString());
+        Task<string> contentTask = securityService.DechipherData(note.Content, user.EncryptionKey, note.Issued.ToString());
         Task.WaitAll(new Task[] { nameTask, descriptionTask, contentTask });
         string name = await nameTask;
         string description = await descriptionTask;
@@ -39,8 +39,7 @@ public static class ConvertionExtensions
         {
             noteResponses.Add(await note);
         }
-        //! It Works But Probaly it is not the best solution at really
-        //TODO: Find a Better Way to Transform the Data in an async way
+
         return noteResponses;
     }
 }

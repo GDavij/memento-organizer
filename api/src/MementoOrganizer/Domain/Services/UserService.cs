@@ -7,6 +7,8 @@ using MementoOrganizer.Domain.Models.Data;
 using System.Threading.Tasks;
 using MementoOrganizer.Domain.Models.Requests.Users;
 using System;
+using MementoOrganizer.Domain.Models.Responses.Users;
+using MementoOrganizer.Domain.Extensions;
 
 namespace MementoOrganizer.Domain.Services;
 
@@ -48,7 +50,6 @@ public class UserService : IUserService
                 throw new Exception("Admin Already Exists Create a new Admin with an Admin Token");
             }
         }
-
         DateTime issued = DateTime.UtcNow;
         string derivedPassphrase = _securityService.DerivePassphrase(createAdminRequest.Passphrase!, issued.ToString());
 
@@ -57,6 +58,7 @@ public class UserService : IUserService
             createAdminRequest.Email!,
             derivedPassphrase,
             issued,
+            _securityService,
             true);
 
         await _mongoUsersRepository.InsertUser(newUser);
@@ -79,6 +81,7 @@ public class UserService : IUserService
             createUserRequest.Email!,
             derivedPassphrase,
             issued,
+            _securityService,
             false);
 
         await _mongoUsersRepository.InsertUser(user);
@@ -103,6 +106,40 @@ public class UserService : IUserService
         return hasBeenDeleted;
     }
 
+    public async Task<UserResponse> FindUser(string token)
+    {
+        Token<ObjectId>? parsedToken = _securityService.TryParseToken(token, _mongoIdentityProvider);
+        if (parsedToken == null)
+        {
+            throw new Exception("Token is not Valid");
+        }
+
+        User<ObjectId>? authenticatedUser = await _securityService.AuthenticateUser(parsedToken, _mongoUsersRepository);
+        if (authenticatedUser == null)
+        {
+            throw new Exception("Token is not Valid");
+        }
+
+        return authenticatedUser.ToUserResponse<ObjectId>();
+    }
+
+    public async Task<bool> CheckIsAdmin(string token)
+    {
+        Token<ObjectId>? parsedToken = _securityService.TryParseToken(token, _mongoIdentityProvider);
+        if (parsedToken == null)
+        {
+            throw new Exception("Token is not Valid");
+        }
+
+        User<ObjectId>? authenticatedUser = await _securityService.AuthenticateUser(parsedToken, _mongoUsersRepository);
+        if (authenticatedUser == null)
+        {
+            throw new Exception("Token is not Valid");
+        }
+
+        return authenticatedUser.IsAdmin;
+    }
+
     public async Task<string> LoginUser(LoginUserRequest loginUserRequest)
     {
         User<ObjectId>? databaseUser = await _mongoUsersRepository.FindUserByEmail(loginUserRequest.Email!);
@@ -118,5 +155,46 @@ public class UserService : IUserService
         }
 
         return _securityService.GenerateToken<ObjectId>(databaseUser.Id, databaseUser.Passphrase);
+    }
+
+    public async Task<string> UpdateUser(string token, UpdateUserRequest updateUserRequest)
+    {
+        if (
+            updateUserRequest.Email is not null &&
+            await _mongoUsersRepository.FindUserByEmail(updateUserRequest.Email) != null)
+        {
+            throw new Exception("Could not Update User Email, already Exists");
+        }
+
+        Token<ObjectId>? parsedToken = _securityService.TryParseToken(token, _mongoIdentityProvider);
+        if (parsedToken == null)
+        {
+            throw new Exception("Token is Not Valid");
+        }
+
+        User<ObjectId>? authenticatedUser = await _securityService.AuthenticateUser(parsedToken, _mongoUsersRepository);
+        if (authenticatedUser == null)
+        {
+            throw new Exception("Token is not Valid");
+        }
+
+        if (updateUserRequest.Email != null)
+        {
+            authenticatedUser.Email = updateUserRequest.Email;
+        }
+
+        if (updateUserRequest.Passphrase != null)
+        {
+            var derivedPassphrase = _securityService.DerivePassphrase(updateUserRequest.Passphrase, authenticatedUser.Issued.ToString());
+            authenticatedUser.Passphrase = derivedPassphrase;
+        }
+
+        bool hasBeenUpdated = await _mongoUsersRepository.ReplaceUser(authenticatedUser.Id, authenticatedUser);
+        if (hasBeenUpdated)
+        {
+            return _securityService.GenerateToken(authenticatedUser.Id, authenticatedUser.Passphrase);
+        }
+
+        throw new Exception("Could not Update user");
     }
 }

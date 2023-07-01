@@ -3,6 +3,8 @@ using MementoOrganizer.Domain.Models.Requests.Users;
 using MementoOrganizer.Domain.Services.Interfaces;
 using MementoOrganizer.Domain.Services;
 using System.Threading.Tasks;
+using MementoOrganizer.Domain.Models.Responses.Users;
+
 namespace MementoOrganizer.Controllers;
 
 [ApiController]
@@ -36,14 +38,38 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> LoginUser([FromBody()] LoginUserRequest loginUserRequest)
     {
         string token = await _userService.LoginUser(loginUserRequest);
-        return Ok(new { token = token });
+        return Ok(new { token });
     }
 
     [HttpDelete]
     [Route("delete/{token}")]
-    public async Task<IActionResult> Deleteuser([FromRoute()] string token)
+    public async Task<IActionResult> DeleteUser([FromRoute()] string token)
     {
         bool hasBeenDeleted = await _userService.DeleteUser(token);
         return Ok(hasBeenDeleted);
+    }
+
+    [HttpGet]
+    [Route("find")]
+    public async Task<IActionResult> FindUser([FromHeader] string authorization)
+    {
+        UserResponse userResponse = await _userService.FindUser(authorization);
+        return Ok(userResponse);
+    }
+
+    [HttpGet]
+    [Route("isAdmin")]
+    public async Task<IActionResult> CheckIsAdmin([FromHeader] string authorization)
+    {
+        bool isAdmin = await _userService.CheckIsAdmin(authorization);
+        return Ok(isAdmin);
+    }
+
+    [HttpPut]
+    [Route("update/{token}")]
+    public async Task<IActionResult> UpdateUser([FromRoute()] string token, [FromBody()] UpdateUserRequest updateUserRequest)
+    {
+        string newToken = await _userService.UpdateUser(token, updateUserRequest);
+        return Ok(new { token = newToken });
     }
 }
