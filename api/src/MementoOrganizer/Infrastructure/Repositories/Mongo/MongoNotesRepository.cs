@@ -27,6 +27,15 @@ public class MongoNotesRepository : INotesRepository<ObjectId>
         return query.IsCompletedSuccessfully;
     }
 
+    public async Task<bool> DeleteNotesByOwner(ObjectId ownerId)
+    {
+        var filter = Builders<Note<ObjectId>>.Filter.Eq((note) => note.Owner, ownerId);
+        var query = _notesCollection.DeleteManyAsync(filter);
+
+        await query;
+        return query.IsCompletedSuccessfully;
+    }
+
     public async Task<List<Note<ObjectId>>> FindAllNotesByOwner(ObjectId owner)
     {
         var filter = Builders<Note<ObjectId>>.Filter.Eq(note => note.Owner, owner);

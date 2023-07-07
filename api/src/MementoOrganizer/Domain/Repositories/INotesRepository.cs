@@ -10,4 +10,5 @@ public interface INotesRepository<TId>
     Task<Note<TId>> FindNoteById(TId id, TId ownerId);
     Task<bool> ReplaceNoteById(TId id, TId ownerId, Note<TId> note);
     Task<bool> DeleteNoteById(TId id, TId ownerId);
+    Task<bool> DeleteNotesByOwner(TId ownerId);
 }

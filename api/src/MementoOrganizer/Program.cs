@@ -31,15 +31,16 @@ builder.Services.SetupDomain();
 // Add Application Rules (Validation, Middlewares, etc...)
 builder.Services.SetupApplicationRules();
 
+string productionWebURL = Environment.GetEnvironmentVariable("mementoOrganizerWebProductionURL") ?? "http://localhost:3000";
+
 string corsPolicyName = "_mementoOrganizerDefaultOrigins";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(corsPolicyName, policy =>
     {
-        policy.WithOrigins("http://127.0.0.1:3000", "http://localhost:3000");
-        policy.WithMethods("GET", "POST", "DELETE", "PUT", "OPTIONS");
-        policy.WithHeaders("content-type", "authorization");
-        // Just for now at Development
+        policy.WithOrigins(productionWebURL);
+        policy.AllowAnyMethod();
+        policy.AllowAnyHeader();
     });
 });
 

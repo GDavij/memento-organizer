@@ -17,15 +17,17 @@ public class UserService : IUserService
     private readonly IIdentityProvider<ObjectId> _mongoIdentityProvider;
     private readonly ISecurityService _securityService;
     private readonly IUsersRepository<ObjectId> _mongoUsersRepository;
-
+    private readonly INotesRepository<ObjectId> _mongoNotesRepository;
     public UserService(
         IIdentityProvider<ObjectId> mongoIdentityProvider,
         ISecurityService securityService,
-        IUsersRepository<ObjectId> mongoUsersRepository)
+        IUsersRepository<ObjectId> mongoUsersRepository,
+        INotesRepository<ObjectId> mongoNotesRepository)
     {
         _mongoIdentityProvider = mongoIdentityProvider;
         _securityService = securityService;
         _mongoUsersRepository = mongoUsersRepository;
+        _mongoNotesRepository = mongoNotesRepository;
     }
 
     public async Task CreateAdmin(CreateAdminRequest createAdminRequest)
@@ -102,8 +104,14 @@ public class UserService : IUserService
             throw new Exception("Token is not Valid");
         }
 
-        bool hasBeenDeleted = await _mongoUsersRepository.DeleteUserById(parsedToken.Id);
-        return hasBeenDeleted;
+        bool notesHasBeenDeleted = await _mongoNotesRepository.DeleteNotesByOwner(authenticatedUser.Id);
+        if (notesHasBeenDeleted)
+        {
+
+            bool hasBeenDeleted = await _mongoUsersRepository.DeleteUserById(authenticatedUser.Id);
+            return hasBeenDeleted;
+        }
+        return false;
     }
 
     public async Task<UserResponse> FindUser(string token)
