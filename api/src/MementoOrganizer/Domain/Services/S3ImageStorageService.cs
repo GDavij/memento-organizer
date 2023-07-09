@@ -8,7 +8,9 @@ using MementoOrganizer.Domain.Providers;
 using MementoOrganizer.Domain.Repositories;
 using MementoOrganizer.Domain.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 using MongoDB.Bson;
+using MementoOrganizer.Domain.Extensions;
 
 namespace MementoOrganizer.Domain.Services;
 public class S3ImageStorageService : IStorageService
@@ -44,19 +46,26 @@ public class S3ImageStorageService : IStorageService
             throw new Exception("Token is not Valid");
         }
 
+        HashSet<string> validContentTypes = new HashSet<string> { "image/png", "image/jpeg" };
+        if (!validContentTypes.Contains(formFile.ContentType))
+            throw new Exception("File Type is not Allowed");
+
         if (formFile != null && formFile.Length > 0)
         {
             string blobName = Guid.NewGuid().ToString();
+            byte[] byteData;
             using (var stream = new MemoryStream())
             {
-                byte[] byteData;
                 formFile.CopyTo(stream);
                 byteData = stream.ToArray();
-                bool hasBeenPutted = await _s3ImageRepository.PutObject(byteData, blobName);
-
-                if (!hasBeenPutted)
-                    throw new Exception("Could not Upload File To S3");
             }
+
+            byte[] encriptedFile = await _securityService.EncriptData(byteData.ToBase64String(), authenticatedUser.EncryptionKey, authenticatedUser.Issued.ToString());
+
+            bool hasBeenPutted = await _s3ImageRepository.PutObject(encriptedFile, blobName);
+            if (!hasBeenPutted)
+                throw new Exception("Could not Upload File To S3");
+
             authenticatedUser.ImagesAtached.Add(blobName);
             //TODO: Refactore `Replace User` to allow it to be Storage Safe
             bool hasBeenUpdated = await _mongoUsersRepository.ReplaceUser(authenticatedUser.Id, authenticatedUser);
@@ -95,16 +104,16 @@ public class S3ImageStorageService : IStorageService
             throw new Exception("Could not Find Obeject");
 
         string base64Blob;
+        byte[] blobData;
         using (var responseStream = response.ResponseStream)
         {
             using (var memoryStream = new MemoryStream())
             {
                 responseStream.CopyTo(memoryStream);
-                byte[] blobData = memoryStream.ToArray();
-
-                base64Blob = Convert.ToBase64String(blobData);
+                blobData = memoryStream.ToArray();
             }
         }
+        base64Blob = await _securityService.DecriptData(blobData, authenticatedUser.EncryptionKey, authenticatedUser.Issued.ToString());
 
         return base64Blob;
     }

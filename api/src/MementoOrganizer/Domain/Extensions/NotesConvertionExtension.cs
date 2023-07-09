@@ -12,9 +12,9 @@ public static class ConvertionExtensions
     public async static Task<NoteResponse> ToNoteResponse<TId>(this Note<TId> note, User<TId> user, ISecurityService securityService)
     {
 
-        Task<string> nameTask = securityService.DechipherData(note.Name, user.EncryptionKey, note.Issued.ToString());
-        Task<string> descriptionTask = securityService.DechipherData(note.Description, user.EncryptionKey, note.Issued.ToString());
-        Task<string> contentTask = securityService.DechipherData(note.Content, user.EncryptionKey, note.Issued.ToString());
+        Task<string> nameTask = securityService.DecriptData(note.Name.FromBase64String(), user.EncryptionKey, note.Issued.ToString());
+        Task<string> descriptionTask = securityService.DecriptData(note.Description.FromBase64String(), user.EncryptionKey, note.Issued.ToString());
+        Task<string> contentTask = securityService.DecriptData(note.Content.FromBase64String(), user.EncryptionKey, note.Issued.ToString());
         Task.WaitAll(new Task[] { nameTask, descriptionTask, contentTask });
         string name = await nameTask;
         string description = await descriptionTask;
