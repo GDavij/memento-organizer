@@ -1,6 +1,6 @@
-import { TBaseNoteData, TNoteTypes } from "@/models/data/editorTypes";
-import { ReactNode, createContext, useContext, useState } from "react";
-import { Descendant, Editor } from "slate";
+import { TBaseNoteData, TNoteTypes } from '@/models/data/editorTypes';
+import { ReactNode, createContext, useContext, useState } from 'react';
+import { Descendant, Editor } from 'slate';
 
 type TEditorContext = {
   editor: Editor | null;
@@ -17,12 +17,14 @@ type TEditorContext = {
   setIsEditingNoteMetadata: (isEditing: boolean) => void;
   noteType: TNoteTypes;
   setNoteType: (noteType: TNoteTypes) => void;
+  isImageLoading: boolean;
+  setIsImageLoading: (isLoading: boolean) => void;
 };
 
 const EditorContext = createContext<TEditorContext>({
   editor: null,
   setEditor(editor: Editor) {},
-  noteContent: [{ type: "paragraph", children: [{ text: "" }] }],
+  noteContent: [{ type: 'paragraph', children: [{ text: '' }] }],
   setNoteContent(newContent: Descendant[]) {},
   isBold: false,
   setIsBold(newValue: boolean) {},
@@ -32,8 +34,10 @@ const EditorContext = createContext<TEditorContext>({
   setIsUnderline(newValue: boolean) {},
   isEditingNoteMetadata: false,
   setIsEditingNoteMetadata(isEditing: boolean) {},
-  noteType: "paragraph",
+  noteType: 'paragraph',
   setNoteType(noteType: TNoteTypes) {},
+  isImageLoading: false,
+  setIsImageLoading(isLoading: boolean) {},
 });
 
 export function EditorProvider({ children }: { children: ReactNode }) {
@@ -43,7 +47,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
   const [isEditingNoteMetadata, setIsEditingNoteMetadata] = useState(false);
-  const [noteType, setNoteType] = useState<TNoteTypes>("paragraph");
+  const [noteType, setNoteType] = useState<TNoteTypes>('paragraph');
+  const [isImageLoading, setIsImageLoading] = useState(false);
 
   const editorActions: TEditorContext = {
     editor: editor,
@@ -73,6 +78,10 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     noteType,
     setNoteType(noteType: TNoteTypes) {
       setNoteType(noteType);
+    },
+    isImageLoading,
+    setIsImageLoading(isLoading: boolean) {
+      setIsImageLoading(isLoading);
     },
   };
 

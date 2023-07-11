@@ -1,28 +1,28 @@
 import { Editor } from "slate";
 import { renderMarkdown } from "./renderer";
 import { insertImage } from "./editor.aux";
+import s3ImageService from '@/services/s3ImageStorage.service'
+import { useImageStorageCacheContext } from "@/app/dashboard/contexts/useImageStorageCacheContext";
 
-export const withImagesFromFiles = (editor: Editor) => {
+export const withImagesFromFiles = (editor: Editor, setIsLoadingImage: (isLoading: boolean) => void) => {
     const { isVoid, insertData } = editor;
-
     editor.isVoid = (element) =>
         element.type === "image" ? true : isVoid(element);
 
-    editor.insertData = (data) => {
-        const { files } = data;
+    editor.insertData = async (data) => {
+        const { files, getData, types, items, dropEffect } = data;
         if (files && files.length > 0) {
-            for (const file of files) {
-                const reader = new FileReader();
-                const [mime] = file.type.split("/");
-
-                if (mime === "image") {
-                    reader.addEventListener("load", () => {
-                        const url: string = reader.result as string;
-                        insertImage(editor, url);
-                    });
-
-                    reader.readAsDataURL(file);
-                }
+            setIsLoadingImage(true);
+            const firstFile = files[0];
+            try {
+                const formData = new FormData();
+                formData.append("formDataFile", firstFile);
+                const fileId = await s3ImageService.postImage(formData);
+                await insertImage(editor, fileId)
+            }
+            catch (er) {
+                setIsLoadingImage(false);
+                insertData(data);
             }
         } else {
             insertData(data);

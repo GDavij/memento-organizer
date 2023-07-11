@@ -2,7 +2,7 @@ import { TBaseNoteData, TTextMarks } from "@/models/data/editorTypes";
 import { BaseEditor, Editor, Transforms } from "slate";
 import { HistoryEditor } from "slate-history";
 import { ReactEditor, RenderElementProps, RenderLeafProps } from "slate-react";
-
+import s3ImageStorageService from "@/services/s3ImageStorage.service";
 export function isMarkActive(
     editor: BaseEditor & ReactEditor & HistoryEditor,
     format: TTextMarks
@@ -25,9 +25,9 @@ export function toggleMark(
 
 
 
-export const insertImage = (editor: Editor, url: string) => {
+export const insertImage = async (editor: Editor, url: string) => {
     const text = { text: "" };
-    const image: TBaseNoteData = { type: "image", url, children: [text] };
+    const image: TBaseNoteData = { type: "image", url, children: [text], };
     Transforms.insertNodes(editor, image);
 };
 

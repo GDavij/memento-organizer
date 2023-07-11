@@ -1,12 +1,12 @@
-"use client";
+'use client';
 import {
   Editable,
   RenderElementProps,
   RenderLeafProps,
   Slate,
   withReact,
-} from "slate-react";
-import { useCallback, useEffect, useMemo } from "react";
+} from 'slate-react';
+import { useCallback, useEffect, useMemo } from 'react';
 import {
   Transforms,
   createEditor,
@@ -15,26 +15,24 @@ import {
   node,
   Path,
   Location,
-} from "slate";
+} from 'slate';
 
-import { HistoryEditor, withHistory } from "slate-history";
-import isHotkey from "is-hotkey";
+import { HistoryEditor, withHistory } from 'slate-history';
+import isHotkey from 'is-hotkey';
 import {
   countOrderedListN,
   isMarkActive,
   toggleMark,
-} from "@/lib/editor/editor.aux";
-import { useEditor } from "../contexts/editor/useEditor";
-import Loader from "@/app/components/Loader";
-import { TBaseNoteData, hotKeys } from "@/models/data/editorTypes";
-import {
-  renderElement,
-  renderLeaf,
-} from "@/lib/editor/markdown.aux";
+} from '@/lib/editor/editor.aux';
+import { useEditor } from '../contexts/editor/useEditor';
+import Loader from '@/app/components/Loader';
+import { TBaseNoteData, hotKeys } from '@/models/data/editorTypes';
+import { renderElement, renderLeaf } from '@/lib/editor/markdown.aux';
 import {
   withImagesFromFiles,
   withMarkdown,
-} from "@/lib/editor/editorExtensions.setup";
+} from '@/lib/editor/editorExtensions.setup';
+import { useImageStorageCacheContext } from '../contexts/useImageStorageCacheContext';
 
 type TEditorScreenProps = {
   initialNoteContent: Descendant[];
@@ -59,11 +57,19 @@ export function EditorScreen({
     setIsUnderline,
     noteType,
     setNoteType,
+    isImageLoading,
+    setIsImageLoading,
   } = useEditor();
 
   const editor = useMemo(
     () =>
-      withMarkdown(withImagesFromFiles(withHistory(withReact(createEditor())))),
+      withMarkdown(
+        withImagesFromFiles(
+          withHistory(withReact(createEditor())),
+          setIsImageLoading
+        )
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
@@ -82,9 +88,9 @@ export function EditorScreen({
         //? Maybe this is not the best implementation of this.
         // But till now it lead to several performance improvement
         // This improvement is probaly because of less eventHandlers to work on this component
-        const isBoldMark = isMarkActive(editor, "bold");
-        const isItalicMark = isMarkActive(editor, "italic");
-        const isUnderlineMark = isMarkActive(editor, "underline");
+        const isBoldMark = isMarkActive(editor, 'bold');
+        const isItalicMark = isMarkActive(editor, 'italic');
+        const isUnderlineMark = isMarkActive(editor, 'underline');
 
         const focusLine = editor.selection?.focus!.path[0] || 0;
         const dataType = (value as TBaseNoteData[])[focusLine].type;
@@ -117,7 +123,7 @@ export function EditorScreen({
         autoFocus
         className="w-full h-full cursor-text caret-emerald-500 selection:text-emerald-500 selection:bg-slate-200 dark:selection:bg-slate-900"
         onKeyDown={async (event) => {
-          if (isHotkey("backspace", event as any)) {
+          if (isHotkey('backspace', event as any)) {
             const focusLine = editor.selection!.focus.path[0];
             const dataType = (editor.children as TBaseNoteData[])[focusLine]
               .type;
@@ -125,38 +131,38 @@ export function EditorScreen({
               setNoteType(dataType);
             }
           }
-          if (isHotkey("enter", event as any)) {
+          if (isHotkey('enter', event as any)) {
             const focusLine = editor.selection!.focus.path[0];
             const data = (editor.children as TBaseNoteData[])[focusLine];
-            if (data.type === "ordered-list") {
+            if (data.type === 'ordered-list') {
               event.preventDefault();
               Transforms.insertNodes(editor, {
-                type: "ordered-list",
+                type: 'ordered-list',
                 children: [
                   { text: `${countOrderedListN(data.children[0].text) + 1}. ` },
                 ],
               });
-            } else if (data.type === "unordered-list") {
+            } else if (data.type === 'unordered-list') {
               event.preventDefault();
               Transforms.insertNodes(editor, {
-                type: "unordered-list",
-                children: [{ text: "- " }],
+                type: 'unordered-list',
+                children: [{ text: '- ' }],
               });
             }
           }
           //TODO: Refactor the hotKeys
-          if (isHotkey("mod+s", event as any)) {
+          if (isHotkey('mod+s', event as any)) {
             event.preventDefault();
             await saveNoteCallback();
-          } else if (isHotkey("mod+z", event)) {
+          } else if (isHotkey('mod+z', event)) {
             event.preventDefault();
             (editor as unknown as HistoryEditor).undo();
-          } else if (isHotkey("mod+y", event)) {
+          } else if (isHotkey('mod+y', event)) {
             event.preventDefault();
             (editor as unknown as HistoryEditor).redo();
-          } else if (isHotkey("tab", event as any)) {
+          } else if (isHotkey('tab', event as any)) {
             event.preventDefault();
-            Transforms.insertText(editor, "   ");
+            Transforms.insertText(editor, '   ');
           } else {
             for (const hotkey in hotKeys) {
               if (isHotkey(hotkey, event as any)) {
