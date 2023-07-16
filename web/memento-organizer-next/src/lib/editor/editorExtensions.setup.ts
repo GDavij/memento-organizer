@@ -1,33 +1,48 @@
-import { Editor } from "slate";
+import { BaseOperation, Editor, Element, Transforms, first, last } from "slate";
 import { renderMarkdown } from "./renderer";
 import { insertImage } from "./editor.aux";
 import s3ImageService from '@/services/s3ImageStorage.service'
 import { useImageStorageCacheContext } from "@/app/dashboard/contexts/useImageStorageCacheContext";
-
-export const withImagesFromFiles = (editor: Editor, setIsLoadingImage: (isLoading: boolean) => void) => {
-    const { isVoid, insertData } = editor;
+import { TBaseNoteData, TNoteTypes, noteTypes } from "@/models/data/editorTypes";
+import { toast } from "react-toastify";
+import { randomUUID } from "crypto";
+export const withImagesFromFiles = (
+    editor: Editor
+) => {
+    console.log("asdadasdsad");
+    const { isVoid, apply, deleteBackward, deleteFragment, insertData, redo, undo } = editor;
     editor.isVoid = (element) =>
         element.type === "image" ? true : isVoid(element);
 
     editor.insertData = async (data) => {
-        const { files, getData, types, items, dropEffect } = data;
-        if (files && files.length > 0) {
-            setIsLoadingImage(true);
+        const { files } = data;
+        if (files && files.length > 0 && data.files.length > 0) {
+
             const firstFile = files[0];
+
             try {
-                const formData = new FormData();
-                formData.append("formDataFile", firstFile);
-                const fileId = await s3ImageService.postImage(formData);
+                let fileId: string | null = localStorage.getItem("actualDraggingImage")
+                if (fileId == null) {
+                    const formData = new FormData();
+                    formData.append("formDataFile", firstFile);
+                    const insertImagePromise = s3ImageService.postImage(formData);
+                    toast.promise(insertImagePromise, { pending: "Uploading Image to Storage", error: "Could not Upload Image", success: "Image Uploaded With Sucess" });
+                    fileId = await insertImagePromise
+                }
                 await insertImage(editor, fileId)
+                if (fileId != null) {
+                    localStorage.removeItem("actualDraggingImage");
+                }
+
+                return;
             }
             catch (er) {
-                setIsLoadingImage(false);
-                insertData(data);
+                return;
             }
-        } else {
-            insertData(data);
         }
-    };
+        insertData(data);
+    }
+
     return editor;
 };
 

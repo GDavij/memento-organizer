@@ -1,9 +1,11 @@
 'use client';
+import Loader from '@/app/components/Loader';
 import { useEditor } from '@/app/dashboard/contexts/editor/useEditor';
 import { useImageStorageCacheContext } from '@/app/dashboard/contexts/useImageStorageCacheContext';
 import { Note, TBaseNoteData, TBaseText } from '@/models/data/editorTypes';
 import s3ImageStorageService from '@/services/s3ImageStorage.service';
 import { MdDelete } from 'react-icons/md';
+import { toast } from 'react-toastify';
 import { Editor, Transforms } from 'slate';
 import { ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 
@@ -13,36 +15,93 @@ type TTextEditorImageProps = {
 };
 
 export function TextEditorImage(props: TTextEditorImageProps) {
-  const { hasCached, addCache, removeCache } = useImageStorageCacheContext();
+  const { hasCached, addCache, hasCachedOnTrash } =
+    useImageStorageCacheContext();
+
   const url = props.renderProps.element.url!;
   const imageB64 = hasCached(url);
-  if (imageB64 == null) {
-    console.log('Não Cacheado');
-    s3ImageStorageService.findImage(url).then((fileData) => {
-      addCache(url!, fileData);
-    });
-  } else {
-    console.log('Cacheado');
-  }
+  //
+  console.log('Sucefully cached');
 
   const path = ReactEditor.findPath(props.editor, props.renderProps.element);
-  return (
-    <div
-      {...props.renderProps.attributes}
-      className="flex w-fit h-fit items-start cursor-grab"
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element*/}
-      <img
-        src={'data:image/jpeg;base64,' + imageB64!}
-        alt={`Image ${url} Could not be loaded or is unavaible`}
-      />
-      <button
-        onClick={() => Transforms.removeNodes(props.editor, { at: path })}
-        className="flex text-red-500 text-2xl -translate-x-8 z-20 translate-y-2"
+
+  if (imageB64 == null) {
+    s3ImageStorageService
+      .findImage(url)
+      .then((fileData) => {
+        console.log('Cached');
+        addCache(url!, fileData);
+      })
+      .catch(async (er) => {
+        const dataFromTrash = hasCachedOnTrash(url);
+        if (dataFromTrash) {
+          const dataBytesStr = atob(dataFromTrash);
+          const bytesData = new Uint8Array(dataBytesStr.length);
+          for (let i = 0; i < dataBytesStr.length; i++)
+            bytesData[i] = dataBytesStr.charCodeAt(i);
+
+          const file = new File([bytesData], 'Download.jpeg', {
+            type: 'image/jpeg',
+          });
+          const formData = new FormData();
+          formData.append('formDataFile', file);
+          const reUploadImage = s3ImageStorageService.postImage(formData);
+          toast.promise(reUploadImage, {
+            pending: 'Re-uploading Image from storage',
+            error: 'Could not Re-upload Image',
+            success: 'Re-upload Image with Sucess',
+          });
+          const fileId = await reUploadImage;
+          console.log(fileId);
+          console.log({ fileId, url });
+          addCache(fileId, dataFromTrash);
+          Transforms.insertNodes(props.editor, {
+            type: 'image',
+            url: fileId,
+            children: [{ text: '' }],
+          });
+          console.log('TrashCache');
+        } else {
+          Transforms.removeNodes(props.editor, { at: path });
+        }
+      });
+  }
+
+  return imageB64 ? (
+    <>
+      <div
+        {...props.renderProps.attributes}
+        contentEditable={false}
+        onDragStart={() => {
+          console.log(`Dragging ${url!}`);
+          localStorage.setItem('actualDraggingImage', url);
+        }}
+        className="flex w-full h-fit items-start cursor-grab justify-center px-8"
       >
-        <MdDelete />
-      </button>
-      {props.renderProps.children}
+        {/* eslint-disable-next-line @next/next/no-img-element*/}
+        <div className="w-full h-full  border-4 rounded-lg border-slate-300 dark:border-slate-800 bg-slate-300 dark:bg-slate-800">
+          <img
+            src={'data:image/jpeg;base64,' + imageB64!}
+            alt={`Image ${url} Could not be loaded or is unavaible`}
+            className="rounded-lg"
+          />
+        </div>
+        <button
+          onClick={() => Transforms.removeNodes(props.editor, { at: path })}
+          className="flex text-red-500 text-2xl bg-slate-300 dark:bg-slate-800 -translate-x-[4px] translate-y-[50%] rounded-r-lg p-2"
+        >
+          <MdDelete />
+        </button>
+        {props.renderProps.children}
+      </div>
+      <div></div>
+    </>
+  ) : (
+    <div
+      className="border-4 border-slate-200 dark:border-slate-800 rounded-lg p-4"
+      contentEditable="false"
+    >
+      <Loader loadingText={`Trying to Load Image ${url}`} />
     </div>
   );
 }

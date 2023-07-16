@@ -33,6 +33,8 @@ import {
   withMarkdown,
 } from '@/lib/editor/editorExtensions.setup';
 import { useImageStorageCacheContext } from '../contexts/useImageStorageCacheContext';
+import s3ImageStorageService from '@/services/s3ImageStorage.service';
+import { toast } from 'react-toastify';
 
 type TEditorScreenProps = {
   initialNoteContent: Descendant[];
@@ -63,12 +65,7 @@ export function EditorScreen({
 
   const editor = useMemo(
     () =>
-      withMarkdown(
-        withImagesFromFiles(
-          withHistory(withReact(createEditor())),
-          setIsImageLoading
-        )
-      ),
+      withHistory(withMarkdown(withImagesFromFiles(withReact(createEditor())))),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
@@ -156,10 +153,10 @@ export function EditorScreen({
             await saveNoteCallback();
           } else if (isHotkey('mod+z', event)) {
             event.preventDefault();
-            (editor as unknown as HistoryEditor).undo();
+            editor.undo();
           } else if (isHotkey('mod+y', event)) {
             event.preventDefault();
-            (editor as unknown as HistoryEditor).redo();
+            editor.redo();
           } else if (isHotkey('tab', event as any)) {
             event.preventDefault();
             Transforms.insertText(editor, '   ');

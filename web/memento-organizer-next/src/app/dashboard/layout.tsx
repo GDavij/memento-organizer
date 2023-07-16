@@ -9,6 +9,7 @@ import { ReactEditor } from 'slate-react';
 import { HistoryEditor } from 'slate-history';
 import { TBaseNoteData, TBaseText } from '@/models/data/editorTypes';
 import { ImageStorageCacheProvider } from './contexts/useImageStorageCacheContext';
+import { BackdropProvider } from './contexts/useBackdrop';
 
 declare module 'slate' {
   interface CustomTypes {
@@ -21,19 +22,21 @@ declare module 'slate' {
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { open } = useSidebar();
   return (
-    <ImageStorageCacheProvider>
-      <EditorProvider>
-        <TopBar />
-        <div className="w-full h-full flex flex-shrink flex-grow-0 overflow-auto">
-          <NavigationBar hidden={open} />
-          <div
-            id="dashboard-content-container"
-            className=" w-full h-full flex flex-col items-center p-4 overflow-auto scroll-smooth"
-          >
-            {children}
+    <BackdropProvider>
+      <ImageStorageCacheProvider>
+        <EditorProvider>
+          <TopBar />
+          <div className="w-full h-full flex flex-shrink flex-grow-0 overflow-auto">
+            <NavigationBar hidden={open} />
+            <div
+              id="dashboard-content-container"
+              className=" w-full h-full flex flex-col items-center p-4 overflow-auto scroll-smooth"
+            >
+              {children}
+            </div>
           </div>
-        </div>
-      </EditorProvider>
-    </ImageStorageCacheProvider>
+        </EditorProvider>
+      </ImageStorageCacheProvider>
+    </BackdropProvider>
   );
 }

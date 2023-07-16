@@ -1,86 +1,91 @@
-"use client";
+'use client';
 import {
   MdAssignment,
   MdAssignmentAdd,
   MdAutorenew,
   MdLockClock,
-} from "react-icons/md";
-import { Note } from "@/models/data/note";
-import { useEffect, useId, useState } from "react";
-import notesService from "@/services/notes.service";
-import Link from "next/link";
-import { ToastContainer, toast } from "react-toastify";
-import Loader from "@/app/components/Loader";
-import { useForm } from "react-hook-form";
-import CreateNoteModal from "./components/CreateNoteModal";
-import { useTopBar } from "../contexts/useTopBar";
-import { renderElementDisabled } from "@/lib/editor/markdown.aux";
+} from 'react-icons/md';
+import { Note } from '@/models/data/note';
+import { useEffect, useId, useState } from 'react';
+import notesService from '@/services/notes.service';
+import Link from 'next/link';
+import { ToastContainer, toast } from 'react-toastify';
+import Loader from '@/app/components/Loader';
+import { useForm } from 'react-hook-form';
+import CreateNoteModal from './components/CreateNoteModal';
+import { useTopBar } from '../contexts/useTopBar';
+import { renderElementDisabled } from '@/lib/editor/markdown.aux';
 
 export default function Notes() {
   const { setPageDetails } = useTopBar();
 
   type TFilterOptions =
-    | "Id"
-    | "Name"
-    | "Description"
-    | "Content"
-    | "Issued Date";
+    | 'Id'
+    | 'Name'
+    | 'Description'
+    | 'Content'
+    | 'Issued Date';
   const filterOptions: TFilterOptions[] = [
-    "Id",
-    "Name",
-    "Description",
-    "Content",
-    "Issued Date",
+    'Id',
+    'Name',
+    'Description',
+    'Content',
+    'Issued Date',
   ];
   const { watch, register } = useForm<{
     filterType: TFilterOptions;
     filterData: string;
-  }>({ defaultValues: { filterData: "", filterType: "Name" } });
+  }>({ defaultValues: { filterData: '', filterType: 'Name' } });
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
   const [isFetchingNotes, setIsFetchingNotes] = useState(true);
 
   function filterSearch(item: Note, index: number): boolean {
-    switch (watch("filterType")) {
-      case "Id":
+    switch (watch('filterType')) {
+      case 'Id':
         return item.id
           .toUpperCase()
-          .includes(watch("filterData").toUpperCase());
-      case "Name":
+          .includes(watch('filterData').toUpperCase());
+      case 'Name':
         return item.name
           .toUpperCase()
-          .includes(watch("filterData").toUpperCase());
-      case "Description":
+          .includes(watch('filterData').toUpperCase());
+      case 'Description':
         return item.description
           .toUpperCase()
-          .includes(watch("filterData").toUpperCase());
-      case "Content":
+          .includes(watch('filterData').toUpperCase());
+      case 'Content':
         return item.content
           .toUpperCase()
-          .includes(watch("filterData").toUpperCase());
-      case "Issued Date":
+          .includes(watch('filterData').toUpperCase());
+      case 'Issued Date':
         return item.issued
           .toUpperCase()
-          .includes(watch("filterData").toUpperCase());
+          .includes(watch('filterData').toUpperCase());
     }
   }
 
   useEffect(() => {
     setFilteredNotes(notes.filter(filterSearch));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch("filterData"), watch("filterType")]);
+  }, [watch('filterData'), watch('filterType')]);
 
   async function fetchNotes() {
     setIsFetchingNotes(true);
-    const aux = await notesService.getNotesByOwner();
+    const notesFetched = notesService.getNotesByOwner();
+    toast.promise(notesFetched, {
+      pending: 'Fetching Notes',
+      error: 'Could not Fetch Notes',
+      success: 'Notes Fetched with Sucess',
+    });
+    const aux = await notesFetched;
     setNotes(aux);
     setFilteredNotes(aux.filter(filterSearch));
     setIsFetchingNotes(false);
-    toast.success("Notes fetched with sucess");
   }
   useEffect(() => {
-    setPageDetails({ pageName: "Notes List" });
+    setPageDetails({ pageName: 'Notes List' });
     fetchNotes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -103,7 +108,7 @@ export default function Notes() {
         >
           Refresh Notes
           <span
-            className={`inline-block  ${isFetchingNotes && "animate-spin"} `}
+            className={`inline-block  ${isFetchingNotes && 'animate-spin'} `}
           >
             <MdAutorenew className="inline text-lg" />
           </span>
@@ -117,7 +122,7 @@ export default function Notes() {
             <div className="w-32">Filter by:</div>
             <select
               className="bg-transparent w-full h-full outline-none"
-              {...register("filterType")}
+              {...register('filterType')}
             >
               {filterOptions.map((option) => (
                 <option
@@ -131,7 +136,7 @@ export default function Notes() {
             </select>
           </span>
           <input
-            {...register("filterData")}
+            {...register('filterData')}
             id={filterId}
             type="search"
             placeholder="filter"
@@ -171,7 +176,11 @@ export default function Notes() {
                 <section className="font-light text-md text-slate-500 dark:text-gray-400 p-2 pb-4 rounded-lg bg-slate-200 dark:bg-slate-700 flex flex-col gap-4">
                   <div className="h-16 truncate">
                     <h3 className="font-bold">Description</h3>
-                    <span className="overflow-hidden">{note.description != "" ? note.description : "No Description, Add One!"}</span>
+                    <span className="overflow-hidden">
+                      {note.description != ''
+                        ? note.description
+                        : 'No Description, Add One!'}
+                    </span>
                   </div>
                   <div className="h-24 border-l-2 border-emerald-500 pl-1">
                     <h3 className="font-bold">Content</h3>
@@ -186,27 +195,32 @@ export default function Notes() {
               </Link>
             </div>
           ))
-        ) : notes.length == 0  ? (
+        ) : notes.length == 0 ? (
           <section className="w-full h-full flex flex-col gap-2 items-center justify-center">
             <h1 className=" text-lg md:text-4xl">
               You Don&apos;t have any Notes Yet
             </h1>
             <article className=" text-sm md:text-lg  font-light text-slate-500 dark:text-gray-100">
-              Create your first note by clicking in the Create New Note{" "}
+              Create your first note by clicking in the Create New Note{' '}
               <MdAssignmentAdd className="inline text-lg" />
               &quot; Button
             </article>
           </section>
-        ) : (<section className="w-full h-full flex flex-col gap-2 items-center justify-center overflow-clip text-ellipsis">
-        <h1 className=" text-lg md:text-4xl ">
-          We Don&apos;t find any notes while searching for a {watch("filterType")} 
-        </h1>
-        <article className="text-sm md:text-lg flex items-end justify-center  whitespace-nowrap font-light text-slate-500 dark:text-gray-100">
-          The filter  &ldquo;
-          <span className="h-fit max-w-[50cqw] overflow-hidden text-ellipsis inline-block">{watch("filterData")}</span>
-          &rdquo; Don&lsquo;t find any notes
-        </article>
-      </section> )}
+        ) : (
+          <section className="w-full h-full flex flex-col gap-2 items-center justify-center overflow-clip text-ellipsis">
+            <h1 className=" text-lg md:text-4xl ">
+              We Don&apos;t find any notes while searching for a{' '}
+              {watch('filterType')}
+            </h1>
+            <article className="text-sm md:text-lg flex items-end justify-center  whitespace-nowrap font-light text-slate-500 dark:text-gray-100">
+              The filter &ldquo;
+              <span className="h-fit max-w-[50cqw] overflow-hidden text-ellipsis inline-block">
+                {watch('filterData')}
+              </span>
+              &rdquo; Don&lsquo;t find any notes
+            </article>
+          </section>
+        )}
       </div>
       <ToastContainer />
       <CreateNoteModal

@@ -11,7 +11,7 @@ async function findImage(imageId: string): Promise<string> {
 }
 
 async function deleteImage(imageId: string): Promise<boolean> {
-    return (await axios.get<boolean>(`/storage/images/find/${imageId}`)).data
+    return (await axios.delete<boolean>(`/storage/images/delete/${imageId}`)).data
 }
 
 const service = {
