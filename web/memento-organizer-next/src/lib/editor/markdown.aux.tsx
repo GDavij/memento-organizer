@@ -92,10 +92,12 @@ export function TextEditorImage(props: TTextEditorImageProps) {
     </>
   ) : (
     <div
+      contentEditable={false}
       className="border-4 border-slate-200 dark:border-slate-800 rounded-lg p-4"
-      contentEditable="false"
+      {...props.renderProps.attributes}
     >
       <Loader loadingText={`Trying to Load Image ${url}`} />
+      {props.renderProps.children}
     </div>
   );
 }
