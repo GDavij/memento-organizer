@@ -9,7 +9,6 @@ import { randomUUID } from "crypto";
 export const withImagesFromFiles = (
     editor: Editor
 ) => {
-    console.log("asdadasdsad");
     const { isVoid, apply, deleteBackward, deleteFragment, insertData, redo, undo } = editor;
     editor.isVoid = (element) =>
         element.type === "image" ? true : isVoid(element);

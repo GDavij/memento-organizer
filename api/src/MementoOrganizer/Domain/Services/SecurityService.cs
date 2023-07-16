@@ -132,7 +132,6 @@ public class SecurityService : ISecurityService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);// Probaly Remove This or use an ILogger instance for logging
             return null;
         }
     }

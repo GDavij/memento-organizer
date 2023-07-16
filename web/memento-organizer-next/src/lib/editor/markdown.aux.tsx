@@ -21,7 +21,6 @@ export function TextEditorImage(props: TTextEditorImageProps) {
   const url = props.renderProps.element.url!;
   const imageB64 = hasCached(url);
   //
-  console.log('Sucefully cached');
 
   const path = ReactEditor.findPath(props.editor, props.renderProps.element);
 
@@ -29,7 +28,6 @@ export function TextEditorImage(props: TTextEditorImageProps) {
     s3ImageStorageService
       .findImage(url)
       .then((fileData) => {
-        console.log('Cached');
         addCache(url!, fileData);
       })
       .catch(async (er) => {
@@ -52,15 +50,12 @@ export function TextEditorImage(props: TTextEditorImageProps) {
             success: 'Re-upload Image with Sucess',
           });
           const fileId = await reUploadImage;
-          console.log(fileId);
-          console.log({ fileId, url });
           addCache(fileId, dataFromTrash);
           Transforms.insertNodes(props.editor, {
             type: 'image',
             url: fileId,
             children: [{ text: '' }],
           });
-          console.log('TrashCache');
         } else {
           Transforms.removeNodes(props.editor, { at: path });
         }
@@ -73,7 +68,6 @@ export function TextEditorImage(props: TTextEditorImageProps) {
         {...props.renderProps.attributes}
         contentEditable={false}
         onDragStart={() => {
-          console.log(`Dragging ${url!}`);
           localStorage.setItem('actualDraggingImage', url);
         }}
         className="flex w-full h-fit items-start cursor-grab justify-center px-8"

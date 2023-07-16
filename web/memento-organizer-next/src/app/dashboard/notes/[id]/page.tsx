@@ -120,7 +120,6 @@ export default function Notes() {
       const imageUrl = undosImagesToDelete[i].node.url!;
       //Wrap in a `TryCatch` block because it isn't clearing
       if (!hasCached(imageUrl)) {
-        console.log('Hello World');
         continue;
       }
       try {
@@ -159,7 +158,6 @@ export default function Notes() {
       const imageUrl = redosImagesToDelete[i].node.url!;
       //Wrap in a `TryCatch` block because it isn't clearing
       if (!hasCached(imageUrl)) {
-        console.log('Hello World');
         continue;
       }
       try {
@@ -181,7 +179,6 @@ export default function Notes() {
       const imageUrl = undosImagesToDelete[i].node.url!;
       //Wrap in a `TryCatch` block because it isn't clearing
       if (!hasCached(imageUrl)) {
-        console.log('Hello World');
         continue;
       }
       try {
