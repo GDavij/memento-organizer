@@ -1,48 +1,48 @@
-import { MdDelete } from "react-icons/md";
-import { Editor, Location, NodeEntry, Transforms } from "slate";
-import { ReactEditor, RenderElementProps, RenderLeafProps } from "slate-react";
+import { MdDelete } from 'react-icons/md';
+import { Editor, Location, NodeEntry, Transforms } from 'slate';
+import { ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 
 export const renderMarkdown = (editor: Editor, nodeEntry: NodeEntry) => {
-  let text = (nodeEntry[0] as { text: string,  }).text;
+  let text = (nodeEntry[0] as { text: string }).text;
   if (text) {
     let headers = 0;
-    if (text[0] === "#") {
+    if (text[0] === '#') {
       headers++;
       for (let i = 1; i < 6; i++) {
-        if (text[i] === "#") {
+        if (text[i] === '#') {
           headers++;
         }
       }
-      if (text[headers] == " ") {
+      if (text[headers] == ' ') {
         switch (headers) {
           case 1:
             Transforms.setNodes(editor, {
-              type: "heading-1",
+              type: 'heading-1',
             });
             break;
           case 2:
             Transforms.setNodes(editor, {
-              type: "heading-2",
+              type: 'heading-2',
             });
             break;
           case 3:
             Transforms.setNodes(editor, {
-              type: "heading-3",
+              type: 'heading-3',
             });
             break;
           case 4:
             Transforms.setNodes(editor, {
-              type: "heading-4",
+              type: 'heading-4',
             });
             break;
           case 5:
             Transforms.setNodes(editor, {
-              type: "heading-5",
+              type: 'heading-5',
             });
             break;
           case 6:
             Transforms.setNodes(editor, {
-              type: "heading-6",
+              type: 'heading-6',
             });
             break;
         }
@@ -50,20 +50,20 @@ export const renderMarkdown = (editor: Editor, nodeEntry: NodeEntry) => {
       }
     }
     const orderedListProbability = [
-      "0",
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
+      '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
     ];
     if (orderedListProbability.includes(text[0])) {
-      if (text[1] === "." && text[2] == " ") {
-        Transforms.setNodes(editor, { type: "ordered-list" });
+      if (text[1] === '.' && text[2] == ' ') {
+        Transforms.setNodes(editor, { type: 'ordered-list' });
         return;
       } else {
         let isOrdered = 0;
@@ -75,18 +75,18 @@ export const renderMarkdown = (editor: Editor, nodeEntry: NodeEntry) => {
           i++;
         }
 
-        if (text[isOrdered] === "." && text[isOrdered + 1] === " ") {
-          Transforms.setNodes(editor, { type: "ordered-list" });
+        if (text[isOrdered] === '.' && text[isOrdered + 1] === ' ') {
+          Transforms.setNodes(editor, { type: 'ordered-list' });
           return;
         }
       }
     }
-    if (text[0] === "-" && text[1] === " ") {
-      Transforms.setNodes(editor, { type: "unordered-list" });
+    if (text[0] === '-' && text[1] === ' ') {
+      Transforms.setNodes(editor, { type: 'unordered-list' });
       return;
     }
     Transforms.setNodes(editor, {
-      type: "paragraph",
+      type: 'paragraph',
     });
   }
 };

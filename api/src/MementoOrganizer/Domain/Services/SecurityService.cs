@@ -27,7 +27,7 @@ public class SecurityService : ISecurityService
         return userDatabase;
     }
 
-    public async Task<string> ChipherData(string data, string key, string iv)
+    public async Task<byte[]> EncriptData(string data, string key, string iv)
     {
         UTF8Encoding utf8Encoder = new UTF8Encoding();
         byte[] hashKey = SHA512.Create().ComputeHash(utf8Encoder.GetBytes(key))[..32];
@@ -53,16 +53,15 @@ public class SecurityService : ISecurityService
             }
         }
 
-        return Convert.ToBase64String(encripted);
+        return encripted;
     }
 
-    public async Task<string> DechipherData(string encryptedData, string key, string iv)
+    public async Task<string> DecriptData(byte[] encryptedData, string key, string iv)
     {
         UTF8Encoding utf8Encoding = new UTF8Encoding();
         byte[] hashKey = SHA512.Create().ComputeHash(utf8Encoding.GetBytes(key))[..32];
         byte[] hashIv = SHA512.Create().ComputeHash(utf8Encoding.GetBytes(iv))[..16];
 
-        byte[] chypherDataBytes = Convert.FromBase64String(encryptedData);
         string originalData = String.Empty;
         using (Aes aesAlg = Aes.Create())
         {
@@ -70,7 +69,7 @@ public class SecurityService : ISecurityService
             aesAlg.IV = hashIv;
 
             ICryptoTransform decriptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-            using (MemoryStream msDecrypt = new MemoryStream(chypherDataBytes))
+            using (MemoryStream msDecrypt = new MemoryStream(encryptedData))
             {
                 using (CryptoStream csDecript = new CryptoStream(msDecrypt, decriptor, CryptoStreamMode.Read))
                 {
@@ -133,7 +132,6 @@ public class SecurityService : ISecurityService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);// Probaly Remove This or use an ILogger instance for logging
             return null;
         }
     }

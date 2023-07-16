@@ -47,6 +47,7 @@ export const hotKeys: THotKeys = {
 };
 
 export type TNoteTypes = "paragraph" | "image" | TMarkdownTypes;
+export const noteTypes: TNoteTypes[] = ["paragraph", "image", ...markdownTypes];
 export type TTextMarks = "bold" | "italic" | "underline";
 export type TBaseText = {
   text: string;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MementoOrganizer.Domain.Providers;
 using MementoOrganizer.Domain.Services.Interfaces;
 
@@ -13,6 +14,7 @@ public class User<TId>
     public DateTime LastLogin { get; set; }
     public string EncryptionKey { get; private set; }
     public bool IsAdmin { get; private set; }
+    public List<string> ImagesAtached { get; set; }
 
     public User(
         IIdentityProvider<TId> identityProvider,
@@ -30,5 +32,6 @@ public class User<TId>
         LastLogin = issued;
         EncryptionKey = securityService.DerivePassphrase(Id!.ToString()!, Issued.ToString());
         IsAdmin = isAdmin;
+        ImagesAtached = new List<string>();
     }
 }

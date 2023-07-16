@@ -49,9 +49,9 @@ public class NoteService : INoteService
         DateTime issued = DateTime.UtcNow;
         var description = createNoteRequest.Description ?? "";
         var content = "[{\"type\":\"paragraph\",\"children\":[{\"text\": \"\"}]}]";
-        string encriptedName = await _securityService.ChipherData(createNoteRequest.Name!, authenticatedUser.EncryptionKey, issued.ToString());
-        string encriptedDescription = await _securityService.ChipherData(description, authenticatedUser.EncryptionKey, issued.ToString());
-        string encriptedContent = await _securityService.ChipherData(content, authenticatedUser.EncryptionKey, issued.ToString());
+        string encriptedName = (await _securityService.EncriptData(createNoteRequest.Name!, authenticatedUser.EncryptionKey, issued.ToString())).ToBase64String();
+        string encriptedDescription = (await _securityService.EncriptData(description, authenticatedUser.EncryptionKey, issued.ToString())).ToBase64String();
+        string encriptedContent = (await _securityService.EncriptData(content, authenticatedUser.EncryptionKey, issued.ToString())).ToBase64String();
 
 
         Note<ObjectId> note = new(
@@ -157,21 +157,21 @@ public class NoteService : INoteService
 
         if (updateNoteRequest.Name != null)
         {
-            note.Name = await _securityService.ChipherData(updateNoteRequest.Name, authenticatedUser.EncryptionKey, note.Issued.ToString());
+            note.Name = (await _securityService.EncriptData(updateNoteRequest.Name, authenticatedUser.EncryptionKey, note.Issued.ToString())).ToBase64String();
         }
 
         if (updateNoteRequest.Description != null)
         {
-            note.Description = await _securityService.ChipherData(updateNoteRequest.Description, authenticatedUser.EncryptionKey, note.Issued.ToString());
+            note.Description = (await _securityService.EncriptData(updateNoteRequest.Description, authenticatedUser.EncryptionKey, note.Issued.ToString())).ToBase64String();
         }
         else if (updateNoteRequest.Content == null)
         {
-            note.Description = await _securityService.ChipherData("", authenticatedUser.EncryptionKey, note.Issued.ToString());
+            note.Description = (await _securityService.EncriptData("", authenticatedUser.EncryptionKey, note.Issued.ToString())).ToBase64String();
         }
 
         if (updateNoteRequest.Content != null)
         {
-            note.Content = await _securityService.ChipherData(updateNoteRequest.Content, authenticatedUser.EncryptionKey, note.Issued.ToString());
+            note.Content = (await _securityService.EncriptData(updateNoteRequest.Content, authenticatedUser.EncryptionKey, note.Issued.ToString())).ToBase64String();
         }
 
         bool hasBeenUpdated = await _mongoNotesRepository.ReplaceNoteById(note.Id, note.Owner, note);

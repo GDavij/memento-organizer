@@ -1,10 +1,10 @@
-"use client";
-import { useRouter } from "next/navigation";
-import axios from "../../lib/axios.setup";
-import { useId, useState } from "react";
-import { useForm } from "react-hook-form";
-import { MdOutlineSquare } from "react-icons/md";
-import { toast, ToastContainer } from "react-toastify";
+'use client';
+import { useRouter } from 'next/navigation';
+import axios from '../../lib/axios.setup';
+import { useId, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { MdOutlineSquare } from 'react-icons/md';
+import { toast, ToastContainer } from 'react-toastify';
 
 type TSignUpFormData = {
   email: string;
@@ -21,8 +21,8 @@ function auxPassphraseValidationFunction(
   passphraseInputData?: string,
   confirmPassphraseInputData?: string
 ): boolean {
-  const p1InputData = passphraseInputData ?? "";
-  const p2InputData = confirmPassphraseInputData ?? "";
+  const p1InputData = passphraseInputData ?? '';
+  const p2InputData = confirmPassphraseInputData ?? '';
 
   if (p1InputData.length < 16 && p2InputData.length < 16) {
     return false;
@@ -57,15 +57,14 @@ export default function Login() {
 
     try {
       setIsCreating(true);
-      await axios.post("/users/new", filteredBody);
-      toast.success("User successfully created", {
-        position: window.innerWidth < 640 ? "bottom-center" : "top-right",
+      await axios.post('/users/new', filteredBody);
+      toast.success('User successfully created', {
+        position: window.innerWidth < 640 ? 'bottom-center' : 'top-right',
       });
-      toast.info("Redirecting to login page");
-      return route.push("/login");
+      toast.info('Redirecting to login page');
+      return route.push('/login');
     } catch (er) {
-      toast.error("User could not be Created");
-      console.error(er);
+      toast.error('User could not be Created');
     }
 
     setIsCreating(false);
@@ -84,7 +83,7 @@ export default function Login() {
           <label htmlFor={emailInputId}>
             E-Mail*
             <input
-              {...register("email", { required: true })}
+              {...register('email', { required: true })}
               type="email"
               id={emailInputId}
               className="w-full h-8 bg-slate-300 dark:bg-slate-800 outline-none p-6 text-base rounded-md"
@@ -98,13 +97,13 @@ export default function Login() {
             Passphrase*
             <div className=" bg-slate-300 dark:bg-slate-800 text-base rounded-md flex items-center pr-5">
               <input
-                {...register("passphrase", { required: true, minLength: 16 })}
+                {...register('passphrase', { required: true, minLength: 16 })}
                 type="password"
                 id={passphraseInputId}
                 className="w-full h-8 bg-transparent p-6 outline-none"
               />
               <span className="text-slate-600 dark:text-slate-400">
-                {watch("passphrase")?.length || 0}
+                {watch('passphrase')?.length || 0}
               </span>
             </div>
             {errors.passphrase && (
@@ -121,7 +120,7 @@ export default function Login() {
             Confirm Passphrase*
             <div className=" bg-slate-300 dark:bg-slate-800 text-base rounded-md flex items-center pr-5">
               <input
-                {...register("confirmPassphrase", {
+                {...register('confirmPassphrase', {
                   required: true,
                   minLength: 16,
                 })}
@@ -130,7 +129,7 @@ export default function Login() {
                 className="w-full h-8 bg-transparent p-6 outline-none"
               />
               <span className="text-slate-600 dark:text-slate-400">
-                {watch("confirmPassphrase")?.length || 0}
+                {watch('confirmPassphrase')?.length || 0}
               </span>
             </div>
             {errors.confirmPassphrase && (
@@ -142,9 +141,9 @@ export default function Login() {
               </div>
             )}
             {/* TODO: Improve this Algorithim Bellow much verbose*/}
-            {(watch("passphrase")?.length ?? 0) >= 16 ||
-            (watch("confirmPassphrase")?.length ?? 0) >= 16 ? (
-              watch("passphrase") == watch("confirmPassphrase") ? (
+            {(watch('passphrase')?.length ?? 0) >= 16 ||
+            (watch('confirmPassphrase')?.length ?? 0) >= 16 ? (
+              watch('passphrase') == watch('confirmPassphrase') ? (
                 <div className="text-green-400">Passphrases match</div>
               ) : (
                 <div className="text-red-500">Passphrases mismatch</div>
@@ -155,11 +154,11 @@ export default function Login() {
           <button
             className={`p-4 ${
               auxPassphraseValidationFunction(
-                watch("passphrase"),
-                watch("confirmPassphrase")
-              ) && watch("email")
-                ? "bg-green-500 hover:bg-slate-300 hover:text-emerald-500 dark:hover:bg-slate-600"
-                : "bg-red-500 hover:bg-slate-300 hover:text-red-500 dark:hover:bg-slate-600"
+                watch('passphrase'),
+                watch('confirmPassphrase')
+              ) && watch('email')
+                ? 'bg-green-500 hover:bg-slate-300 hover:text-emerald-500 dark:hover:bg-slate-600'
+                : 'bg-red-500 hover:bg-slate-300 hover:text-red-500 dark:hover:bg-slate-600'
             } text-white rounded-2xl shadow-black drop-shadow-sm  transition-all hover:drop-shadow-none  text-lg flex items-center justify-center h-16 disabled:cursor-not-allowed`}
             disabled={isCreating}
           >
@@ -168,7 +167,7 @@ export default function Login() {
                 <MdOutlineSquare />
               </span>
             ) : (
-              "Sign Up"
+              'Sign Up'
             )}
           </button>
         </form>

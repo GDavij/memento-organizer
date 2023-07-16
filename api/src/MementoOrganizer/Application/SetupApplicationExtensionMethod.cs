@@ -16,7 +16,9 @@ using MementoOrganizer.Domain.Models.Requests.Users;
 using MementoOrganizer.Domain.Models.Requests.Notes;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-
+using Amazon.S3;
+using MementoOrganizer.Infrastructure.Repositories.AWSS3;
+using Amazon.S3.Model;
 
 namespace MementoOrganizer.Application;
 
@@ -28,7 +30,9 @@ public static class SetupApplicationExtensionMethod
             .AddScoped<IDatabaseConnection<IMongoDatabase>, MongoDatabaseConnection>()
             .AddScoped<IUsersRepository<ObjectId>, MongoUsersRepository>()
             .AddScoped<INotesRepository<ObjectId>, MongoNotesRepository>()
-            .AddSingleton<IIdentityProvider<ObjectId>, MongoIdentityProvider>();
+            .AddSingleton<IIdentityProvider<ObjectId>, MongoIdentityProvider>()
+            .AddScoped<IStorageConnection<AmazonS3Client>, AmazonS3StorageConnection>()
+            .AddScoped<IStorageRepository<GetObjectResponse>, S3ImageRepository>();
 
         return services;
     }
@@ -38,7 +42,8 @@ public static class SetupApplicationExtensionMethod
         services
             .AddScoped<ISecurityService, SecurityService>()
             .AddScoped<IUserService, UserService>()
-            .AddScoped<INoteService, NoteService>();
+            .AddScoped<INoteService, NoteService>()
+            .AddScoped<IStorageService, S3ImageStorageService>();
 
         return services;
     }
