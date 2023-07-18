@@ -12,6 +12,8 @@ public interface ISecurityService
     Task<byte[]> EncriptData(string data, string key, string iv);
     Task<string> DecriptData(byte[] encriptedData, string key, string iv);
     string DerivePassphrase(string passphrase, string salt);
+    string DerivePassphrase(byte[] passphrase, string salt);
+
     string GenerateToken<TId>(TId id, string passphrase);
     Token<TId>? TryParseToken<TId>(string? token, IIdentityProvider<TId> identityProvider);
 

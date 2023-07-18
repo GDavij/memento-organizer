@@ -2,11 +2,8 @@ using MementoOrganizer.Domain.Entities;
 using MementoOrganizer.Domain.Services.Interfaces;
 using MementoOrganizer.Domain.Repositories;
 using MementoOrganizer.Domain.Providers;
-using MongoDB.Bson;
 using MementoOrganizer.Domain.Models.Data;
-using System.Threading.Tasks;
 using MementoOrganizer.Domain.Models.Requests.Users;
-using System;
 using MementoOrganizer.Domain.Models.Responses.Users;
 using MementoOrganizer.Domain.Extensions;
 
@@ -53,14 +50,16 @@ public class UserService : IUserService
             }
         }
         DateTime issued = DateTime.UtcNow;
-        string derivedPassphrase = _securityService.DerivePassphrase(createAdminRequest.Passphrase!, issued.ToString());
+        string derivedPassphrase = _securityService
+                    .DerivePassphrase(createAdminRequest.Passphrase!, issued.ToString());
 
+        string encryptionKey = GenerateEncryptionKey(derivedPassphrase);
         User<ObjectId> newUser = new User<ObjectId>(
             _mongoIdentityProvider,
             createAdminRequest.Email!,
             derivedPassphrase,
             issued,
-            _securityService,
+            encryptionKey,
             true);
 
         await _mongoUsersRepository.InsertUser(newUser);
@@ -78,12 +77,13 @@ public class UserService : IUserService
         string derivedPassphrase = _securityService
                     .DerivePassphrase(createUserRequest.Passphrase!, issued.ToString());
 
+        string encryptionKey = GenerateEncryptionKey(derivedPassphrase);
         User<ObjectId> user = new User<ObjectId>(
             _mongoIdentityProvider,
             createUserRequest.Email!,
             derivedPassphrase,
             issued,
-            _securityService,
+            encryptionKey,
             false);
 
         await _mongoUsersRepository.InsertUser(user);
@@ -204,5 +204,14 @@ public class UserService : IUserService
         }
 
         throw new Exception("Could not Update user");
+    }
+
+    private string GenerateEncryptionKey(string derivedPassphrase)
+    {
+        Secret secureRandomNumber = Secret.Random(512);
+        ArraySegment<byte> keyBytes = new ArraySegment<byte>(new byte[512]);
+        secureRandomNumber.WriteSecretIntoBuffer(keyBytes);
+        string encryptionKey = _securityService.DerivePassphrase(keyBytes.Array!, derivedPassphrase);
+        return encryptionKey;
     }
 }

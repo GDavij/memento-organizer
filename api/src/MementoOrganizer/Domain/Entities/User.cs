@@ -21,7 +21,7 @@ public class User<TId>
         string email,
         string derivedPassphrase,
         DateTime issued,
-        ISecurityService securityService,
+        string encryptionKey,
         bool isAdmin
         )
     {
@@ -30,7 +30,7 @@ public class User<TId>
         Passphrase = derivedPassphrase;
         Issued = issued;
         LastLogin = issued;
-        EncryptionKey = securityService.DerivePassphrase(Id!.ToString()!, Issued.ToString());
+        EncryptionKey = encryptionKey;
         IsAdmin = isAdmin;
         ImagesAtached = new List<string>();
     }
