@@ -96,6 +96,17 @@ public class SecurityService : ISecurityService
         return Convert.ToBase64String(bytesDerivation);
     }
 
+    public string DerivePassphrase(byte[] passphrase, string salt)
+    {
+        UTF8Encoding utf8Encoder = new UTF8Encoding();
+        byte[] hashSaltBytes = SHA256.Create().ComputeHash(utf8Encoder.GetBytes(salt));
+
+        byte[] bytesDerivation = new Rfc2898DeriveBytes(passphrase, hashSaltBytes, 210_000, HashAlgorithmName.SHA512)
+                                    .GetBytes(512);//? Maybe get 256 Bytes for Use Less Database Storage;
+
+        return Convert.ToBase64String(bytesDerivation);
+    }
+
     public string GenerateToken<TId>(TId id, string passphrase)
     {
         string token = JwtBuilder.Create()
@@ -132,7 +143,10 @@ public class SecurityService : ISecurityService
         }
         catch (Exception e)
         {
+            Console.WriteLine(e.Message);
             return null;
         }
     }
+
+
 }
