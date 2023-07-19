@@ -6,6 +6,10 @@ using MementoOrganizer.Domain.Models.Data;
 using MementoOrganizer.Domain.Models.Requests.Users;
 using MementoOrganizer.Domain.Models.Responses.Users;
 using MementoOrganizer.Domain.Extensions;
+using MongoDB.Bson;
+using System.Threading.Tasks;
+using System;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace MementoOrganizer.Domain.Services;
 
@@ -213,5 +217,40 @@ public class UserService : IUserService
         secureRandomNumber.WriteSecretIntoBuffer(keyBytes);
         string encryptionKey = _securityService.DerivePassphrase(keyBytes.Array!, derivedPassphrase);
         return encryptionKey;
+    }
+
+    Task IUserService.CreateAdmin(CreateAdminRequest createAdminRequest)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    Task IUserService.CreateUser(CreateUserRequest createUserRequest)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    Task<bool> IUserService.DeleteUser(string token)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    Task<UserResponse> IUserService.FindUser(string token)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    Task<bool> IUserService.CheckIsAdmin(string token)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    Task<string> IUserService.LoginUser(LoginUserRequest loginUserRequest)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    Task<string> IUserService.UpdateUser(string token, UpdateUserRequest updateUserRequest)
+    {
+        throw new System.NotImplementedException();
     }
 }
