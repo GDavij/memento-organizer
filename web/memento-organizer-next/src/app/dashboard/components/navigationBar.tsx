@@ -1,16 +1,29 @@
 'use client';
-import { MdHome, MdArticle, MdAccountBox, MdExitToApp } from 'react-icons/md';
+import {
+  MdHome,
+  MdArticle,
+  MdAccountBox,
+  MdExitToApp,
+  MdSupervisedUserCircle,
+} from 'react-icons/md';
 import { ReactElement, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSidebar } from '../contexts/useSidebar';
 import ConfirmDialog from '@/app/components/ConfirmDialog';
 import { useAuthentication } from '@/context/useAuthenticationContext';
+import usersService from '@/services/user.service';
+import { toast } from 'react-toastify';
+enum EUserRole {
+  Admin = 'admin',
+  User = 'user',
+}
 
 type TNavigationMenu = {
   href: string;
   name: string;
   icon: () => ReactElement;
+  roles: EUserRole[];
 };
 
 const routes: TNavigationMenu[] = [
@@ -18,16 +31,35 @@ const routes: TNavigationMenu[] = [
     href: 'home',
     name: 'Home',
     icon: () => <MdHome />,
+    roles: [EUserRole.User, EUserRole.Admin],
   },
   {
     href: 'notes',
     name: 'Notes',
     icon: () => <MdArticle />,
+    roles: [EUserRole.User],
+  },
+  {
+    href: 'admin/users',
+    name: 'Users',
+    icon: () => <MdSupervisedUserCircle />,
+    roles: [EUserRole.Admin],
   },
 ];
+function verifyRole(roles: EUserRole[], isAdmin: boolean | null) {
+  if (isAdmin === null) return false;
+
+  if (roles.includes(EUserRole.Admin) && isAdmin) {
+    return true;
+  } else if (roles.includes(EUserRole.User) && !isAdmin) {
+    return true;
+  }
+
+  return false;
+}
 
 export function NavigationBar({ hidden }: { hidden: boolean }) {
-  const { logout } = useAuthentication();
+  const { logout, isAdmin } = useAuthentication();
   const path = usePathname();
   const { openClose } = useSidebar();
   const [openExitDialog, setOpenExitDialog] = useState(false);
@@ -51,29 +83,32 @@ export function NavigationBar({ hidden }: { hidden: boolean }) {
             hidden && 'hidden'
           }`}
         >
-          {routes.map((route) => (
-            <li
-              key={route.href}
-              className="w-full h-16 bg-slate-300 dark:bg-slate-800 rounded-lg"
-            >
-              <Link
-                href={'/dashboard/' + route.href}
-                onClick={() => {
-                  if (window.innerWidth <= 640) {
-                    openClose();
-                  }
-                }}
-                className={`flex w-full h-full justify-center items-center gap-4 hover:text-emerald-600 transition-all ${
-                  '/dashboard/' + route.href == path && 'text-emerald-500'
-                }`}
-              >
-                <span className="text-3xl">{route.name}</span>
-                <span className="text-3xl">
-                  <route.icon />
-                </span>
-              </Link>
-            </li>
-          ))}
+          {routes.map(
+            (route) =>
+              verifyRole(route.roles, isAdmin) && (
+                <li
+                  key={route.href}
+                  className="w-full h-16 bg-slate-300 dark:bg-slate-800 rounded-lg"
+                >
+                  <Link
+                    href={'/dashboard/' + route.href}
+                    onClick={() => {
+                      if (window.innerWidth <= 640) {
+                        openClose();
+                      }
+                    }}
+                    className={`flex w-full h-full justify-center items-center gap-4 hover:text-emerald-600 transition-all ${
+                      '/dashboard/' + route.href == path && 'text-emerald-500'
+                    }`}
+                  >
+                    <span className="text-3xl">{route.name}</span>
+                    <span className="text-3xl">
+                      <route.icon />
+                    </span>
+                  </Link>
+                </li>
+              )
+          )}
         </ul>
         <div
           className={`hover:bg-emerald-500 transition-all w-full h-fit mb-4 flex  items-center 

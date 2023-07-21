@@ -1,6 +1,12 @@
 'use client';
 import { User } from '@/models/data/user';
-import { ReactNode, createContext, useContext, useState } from 'react';
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import usersService from '@/services/user.service';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
@@ -8,6 +14,7 @@ type TAuthenticationContext = {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   signup: (email: string, password: string) => Promise<void>;
+  isAdmin: boolean | null;
 };
 
 const AuthenticationContext = createContext({} as TAuthenticationContext);
@@ -18,6 +25,11 @@ type TBackdropProps = {
 
 export function AutheticationProvider({ children }: TBackdropProps) {
   const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  async function getIsAdmin() {
+    const isAdmin = await usersService.checkIsAdmin();
+    setIsAdmin(isAdmin);
+  }
 
   async function login(email: string, passphrase: string) {
     try {
@@ -29,7 +41,7 @@ export function AutheticationProvider({ children }: TBackdropProps) {
       });
       const token = await loginUserRequest;
       localStorage.setItem('token', token);
-
+      await getIsAdmin();
       return router.push('/dashboard/home');
     } catch (err) {}
   }
@@ -51,8 +63,18 @@ export function AutheticationProvider({ children }: TBackdropProps) {
       router.push('/login');
     } catch (err) {}
   }
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem('token')) {
+        getIsAdmin();
+      }
+    } catch (err) {
+      toast.error('Error while checking admin status');
+    }
+  }, []);
   return (
-    <AuthenticationContext.Provider value={{ login, logout, signup }}>
+    <AuthenticationContext.Provider value={{ login, logout, signup, isAdmin }}>
       {children}
     </AuthenticationContext.Provider>
   );
