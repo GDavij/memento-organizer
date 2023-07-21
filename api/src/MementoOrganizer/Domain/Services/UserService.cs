@@ -10,6 +10,7 @@ using MongoDB.Bson;
 using System.Threading.Tasks;
 using System;
 using Microsoft.AspNetCore.DataProtection;
+using System.Collections.Generic;
 
 namespace MementoOrganizer.Domain.Services;
 
@@ -152,6 +153,72 @@ public class UserService : IUserService
         return authenticatedUser.IsAdmin;
     }
 
+    public async Task<bool> DeleteTargetUser(string token, string id)
+    {
+        Token<ObjectId>? parsedToken = _securityService.TryParseToken(token, _mongoIdentityProvider);
+        if (parsedToken == null)
+            throw new Exception("Token is not Valid");
+
+        var idToDelete = _mongoIdentityProvider.ParseIdFromString(id);
+        if (parsedToken.Id == idToDelete)
+            throw new Exception("Could not delete yourself");
+
+        User<ObjectId>? authenticatedUser = await _securityService.AuthenticateUser(parsedToken, _mongoUsersRepository);
+        if (authenticatedUser == null)
+            throw new Exception("Token is not Valid");
+
+        if (authenticatedUser.IsAdmin)
+        {
+            var userToDelete = await _mongoUsersRepository.FindUserById(idToDelete);
+            if (userToDelete == null)
+                throw new Exception("Id is Invalid");
+
+            var hasBeenDeleted = await _mongoUsersRepository.DeleteUserById(userToDelete.Id);
+            return hasBeenDeleted;
+        }
+
+        throw new Exception("Access Denied");
+    }
+
+
+
+    public async Task<List<UserResponse>> ListAllAdmins(string token)
+    {
+        Token<ObjectId>? parsedToken = _securityService.TryParseToken(token, _mongoIdentityProvider);
+        if (parsedToken == null)
+            throw new Exception("Token is not Valid");
+
+        User<ObjectId>? authenticatedUser = await _securityService.AuthenticateUser(parsedToken, _mongoUsersRepository);
+        if (authenticatedUser == null)
+            throw new Exception("Token is not Valid");
+
+        if (authenticatedUser.IsAdmin)
+        {
+            var admins = await _mongoUsersRepository.ListAllActiveAdmins();
+            return admins.ToListUserResponse();
+        }
+        throw new Exception("Access Denied");
+
+    }
+
+    public async Task<List<UserResponse>> ListAllUsers(string token)
+    {
+        Token<ObjectId>? parsedToken = _securityService.TryParseToken(token, _mongoIdentityProvider);
+        if (parsedToken == null)
+            throw new Exception("Token is not Valid");
+
+        User<ObjectId>? authenticatedUser = await _securityService.AuthenticateUser(parsedToken, _mongoUsersRepository);
+        if (authenticatedUser == null)
+            throw new Exception("Token is not Valid");
+
+        if (authenticatedUser.IsAdmin)
+        {
+            var admins = await _mongoUsersRepository.ListAllActiveUsers();
+            return admins.ToListUserResponse();
+        }
+        throw new Exception("Access Denied");
+    }
+
     public async Task<string> LoginUser(LoginUserRequest loginUserRequest)
     {
         User<ObjectId>? databaseUser = await _mongoUsersRepository.FindUserByEmail(loginUserRequest.Email!);
@@ -210,6 +277,46 @@ public class UserService : IUserService
         throw new Exception("Could not Update user");
     }
 
+    public async Task<bool> UpdateTargetUser(string token, string id, UpdateTargetUserRequest updateTargetUserRequest)
+    {
+        if (
+            updateTargetUserRequest.Email is not null &&
+            await _mongoUsersRepository.FindUserByEmail(updateTargetUserRequest.Email) != null)
+        {
+            throw new Exception("Could not Update User Email, already Exists");
+        }
+
+        Token<ObjectId>? parsedToken = _securityService.TryParseToken(token, _mongoIdentityProvider);
+        if (parsedToken == null)
+            throw new Exception("Token is not Valid");
+
+        var idToUpdate = _mongoIdentityProvider.ParseIdFromString(id);
+        if (parsedToken.Id == idToUpdate)
+            throw new Exception("Could not Update yourself");
+
+        User<ObjectId>? authenticatedUser = await _securityService.AuthenticateUser(parsedToken, _mongoUsersRepository);
+        if (authenticatedUser == null)
+            throw new Exception("Token is not Valid");
+
+        if (authenticatedUser.IsAdmin)
+        {
+            var userToUpdate = await _mongoUsersRepository.FindUserById(idToUpdate);
+            if (userToUpdate == null)
+                throw new Exception("Id is Invalid");
+
+            if (updateTargetUserRequest.Email != null)
+                userToUpdate.Email = updateTargetUserRequest.Email;
+
+            if (updateTargetUserRequest.Passphrase != null)
+                userToUpdate.Passphrase = _securityService.DerivePassphrase(updateTargetUserRequest.Passphrase, userToUpdate.Issued.ToString());
+
+            bool hasBeenUpdated = await _mongoUsersRepository.ReplaceUser(userToUpdate.Id, userToUpdate);
+            return hasBeenUpdated;
+        }
+
+        throw new Exception("Access Denied");
+    }
+
     private string GenerateEncryptionKey(string derivedPassphrase)
     {
         Secret secureRandomNumber = Secret.Random(512);
@@ -217,40 +324,5 @@ public class UserService : IUserService
         secureRandomNumber.WriteSecretIntoBuffer(keyBytes);
         string encryptionKey = _securityService.DerivePassphrase(keyBytes.Array!, derivedPassphrase);
         return encryptionKey;
-    }
-
-    Task IUserService.CreateAdmin(CreateAdminRequest createAdminRequest)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    Task IUserService.CreateUser(CreateUserRequest createUserRequest)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    Task<bool> IUserService.DeleteUser(string token)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    Task<UserResponse> IUserService.FindUser(string token)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    Task<bool> IUserService.CheckIsAdmin(string token)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    Task<string> IUserService.LoginUser(LoginUserRequest loginUserRequest)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    Task<string> IUserService.UpdateUser(string token, UpdateUserRequest updateUserRequest)
-    {
-        throw new System.NotImplementedException();
     }
 }

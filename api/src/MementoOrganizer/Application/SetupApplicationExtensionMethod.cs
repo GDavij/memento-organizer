@@ -57,6 +57,7 @@ public static class SetupApplicationExtensionMethod
             .AddScoped<IValidator<LoginUserRequest>, LoginUserRequestValidator>()
             .AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>()
             .AddScoped<IValidator<CreateNoteRequest>, CreateNoteRequestValidator>()
+            .AddScoped<IValidator<UpdateTargetUserRequest>, UpdateTargetUserRequestValidator>()
             .AddFluentValidationAutoValidation();
 
         return services;

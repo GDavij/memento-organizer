@@ -4,6 +4,7 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 using MementoOrganizer.Domain.Connections;
 using MementoOrganizer.Domain.Entities;
+using System.Collections.Generic;
 
 namespace MementoOrganizer.Infrastructure.Repositories.Mongo;
 
@@ -54,9 +55,21 @@ public class MongoUsersRepository : IUsersRepository<ObjectId>
         return;
     }
 
+    public async Task<List<User<ObjectId>>> ListAllActiveAdmins()
+    {
+        var filter = Builders<User<ObjectId>>.Filter.Eq(user => user.IsAdmin, true);
+        return await _usersCollection.Find(filter).ToListAsync();
+    }
+
+    public async Task<List<User<ObjectId>>> ListAllActiveUsers()
+    {
+        var filter = Builders<User<ObjectId>>.Filter.Eq(user => user.IsAdmin, false);
+        return await _usersCollection.Find(filter).ToListAsync();
+    }
+
     public async Task<bool> ReplaceUser(ObjectId ownerId, User<ObjectId> user)
     {
-        var filter = Builders<User<ObjectId>>.Filter.Eq(User => User.Id, ownerId);
+        var filter = Builders<User<ObjectId>>.Filter.Eq(user => user.Id, ownerId);
         var query = _usersCollection.ReplaceOneAsync(filter, user);
         await query;
         return query.IsCompletedSuccessfully;
