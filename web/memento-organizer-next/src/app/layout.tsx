@@ -1,14 +1,15 @@
-import { SidebarProvider } from "./dashboard/contexts/useSidebar";
-import { TopBarProvider } from "./dashboard/contexts/useTopBar";
-import "./globals.css";
-import { Inter } from "next/font/google";
-import "react-toastify/dist/ReactToastify.min.css";
+import { AutheticationProvider } from '@/context/useAuthenticationContext';
+import { SidebarProvider } from './dashboard/contexts/useSidebar';
+import { TopBarProvider } from './dashboard/contexts/useTopBar';
+import './globals.css';
+import { Inter } from 'next/font/google';
+import 'react-toastify/dist/ReactToastify.min.css';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: "Memento Organizer",
-  description: "Your Personal Organizer",
+  title: 'Memento Organizer',
+  description: 'Your Personal Organizer',
 };
 
 export default function RootLayout({
@@ -19,9 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <TopBarProvider>
-          <SidebarProvider>{children}</SidebarProvider>
-        </TopBarProvider>
+        <AutheticationProvider>
+          <TopBarProvider>
+            <SidebarProvider>{children}</SidebarProvider>
+          </TopBarProvider>
+        </AutheticationProvider>
       </body>
     </html>
   );
