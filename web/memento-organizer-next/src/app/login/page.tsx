@@ -6,13 +6,14 @@ import { useId, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { MdOutlineSquare } from 'react-icons/md';
 import { toast, ToastContainer } from 'react-toastify';
-
+import { useAuthentication } from '@/context/useAuthenticationContext';
 type TLoginFormData = {
   email: string;
   passphrase: string;
 };
 
 export default function Login() {
+  const { login } = useAuthentication();
   const route = useRouter();
   const {
     register,
@@ -23,24 +24,10 @@ export default function Login() {
 
   const [isLoging, setIsLoging] = useState(false);
   async function handleLogin(formData: TLoginFormData) {
-    const filteredBody: TLoginFormData = {
-      email: formData.email,
-      passphrase: formData.passphrase,
-    };
+    setIsLoging(true);
     try {
-      setIsLoging(true);
-      const response: { data: { token: string } } = await axios.post(
-        '/users/login',
-        filteredBody
-      );
-      toast.success('User successfully authenticated', {
-        position: window.innerWidth < 640 ? 'bottom-center' : 'top-right',
-      });
-      localStorage.setItem('token', response.data['token']);
-      return route.push('/dashboard/home');
-    } catch (er) {
-      toast.error('User could not be Authenticated');
-    }
+      await login(formData.email, formData.passphrase);
+    } catch (er) {}
 
     setIsLoging(false);
   }

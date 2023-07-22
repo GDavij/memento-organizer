@@ -42,10 +42,10 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete]
-    [Route("delete/{token}")]
-    public async Task<IActionResult> DeleteUser([FromRoute()] string token)
+    [Route("delete")]
+    public async Task<IActionResult> DeleteUser([FromHeader] string authorization)
     {
-        bool hasBeenDeleted = await _userService.DeleteUser(token);
+        bool hasBeenDeleted = await _userService.DeleteUser(authorization);
         return Ok(hasBeenDeleted);
     }
 
@@ -66,10 +66,42 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut]
-    [Route("update/{token}")]
-    public async Task<IActionResult> UpdateUser([FromRoute()] string token, [FromBody()] UpdateUserRequest updateUserRequest)
+    [Route("update")]
+    public async Task<IActionResult> UpdateUser([FromHeader] string authorization, [FromBody()] UpdateUserRequest updateUserRequest)
     {
-        string newToken = await _userService.UpdateUser(token, updateUserRequest);
+        string newToken = await _userService.UpdateUser(authorization, updateUserRequest);
         return Ok(new { token = newToken });
+    }
+
+    [HttpGet]
+    [Route("list")]
+    public async Task<IActionResult> ListUsers([FromHeader] string authorization)
+    {
+        var users = await _userService.ListAllUsers(authorization);
+        return Ok(users);
+    }
+
+    [HttpGet]
+    [Route("list/admins")]
+    public async Task<IActionResult> ListAdmins([FromHeader] string authorization)
+    {
+        var admins = await _userService.ListAllAdmins(authorization);
+        return Ok(admins);
+    }
+
+    [HttpPut]
+    [Route("update/{id}")]
+    public async Task<IActionResult> UpdateTargetUser([FromHeader] string authorization, [FromRoute()] string id, [FromBody()] UpdateTargetUserRequest updateTargetUserRequest)
+    {
+        bool hasBeenUpdated = await _userService.UpdateTargetUser(authorization, id, updateTargetUserRequest);
+        return Ok(hasBeenUpdated);
+    }
+
+    [HttpDelete]
+    [Route("delete/{id}")]
+    public async Task<IActionResult> DeleteTargetUser([FromHeader] string authorization, [FromRoute] string id)
+    {
+        bool hasBeenDeleted = await _userService.DeleteTargetUser(authorization, id);
+        return Ok(hasBeenDeleted);
     }
 }

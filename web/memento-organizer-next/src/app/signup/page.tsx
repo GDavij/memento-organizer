@@ -5,6 +5,7 @@ import { useId, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { MdOutlineSquare } from 'react-icons/md';
 import { toast, ToastContainer } from 'react-toastify';
+import { useAuthentication } from '@/context/useAuthenticationContext';
 
 type TSignUpFormData = {
   email: string;
@@ -35,7 +36,7 @@ function auxPassphraseValidationFunction(
 }
 
 export default function Login() {
-  const route = useRouter();
+  const { signup } = useAuthentication();
   const {
     register,
     handleSubmit,
@@ -50,22 +51,10 @@ export default function Login() {
       return;
     }
 
-    const filteredBody: { email: string; passphrase: string } = {
-      email: formData.email,
-      passphrase: formData.passphrase,
-    };
-
     try {
       setIsCreating(true);
-      await axios.post('/users/new', filteredBody);
-      toast.success('User successfully created', {
-        position: window.innerWidth < 640 ? 'bottom-center' : 'top-right',
-      });
-      toast.info('Redirecting to login page');
-      return route.push('/login');
-    } catch (er) {
-      toast.error('User could not be Created');
-    }
+      await signup(formData.email, formData.passphrase);
+    } catch (er) {}
 
     setIsCreating(false);
   }
