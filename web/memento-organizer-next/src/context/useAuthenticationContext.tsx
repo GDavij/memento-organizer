@@ -27,8 +27,10 @@ export function AutheticationProvider({ children }: TBackdropProps) {
   const router = useRouter();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   async function getIsAdmin() {
-    const isAdmin = await usersService.checkIsAdmin();
-    setIsAdmin(isAdmin);
+    try {
+      const isAdmin = await usersService.checkIsAdmin();
+      setIsAdmin(isAdmin);
+    } catch (er) {}
   }
 
   async function login(email: string, passphrase: string) {
@@ -65,13 +67,7 @@ export function AutheticationProvider({ children }: TBackdropProps) {
   }
 
   useEffect(() => {
-    try {
-      if (localStorage.getItem('token')) {
-        getIsAdmin();
-      }
-    } catch (err) {
-      toast.error('Error while checking admin status');
-    }
+    getIsAdmin();
   }, []);
   return (
     <AuthenticationContext.Provider value={{ login, logout, signup, isAdmin }}>

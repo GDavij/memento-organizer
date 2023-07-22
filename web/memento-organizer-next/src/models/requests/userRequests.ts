@@ -12,3 +12,9 @@ export type TSignupUserRequest = {
     email?: string,
     passphrase?: string
 }
+
+export type TCreateAdminRequest = {
+    email?: string,
+    passphrase?: string
+    adminToken?: string
+}

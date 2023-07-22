@@ -7,42 +7,64 @@ import { User } from '@/models/data/user';
 import { ToastContainer, toast } from 'react-toastify';
 import { MdDelete, MdEditSquare } from 'react-icons/md';
 import ConfirmDialog from '@/app/components/ConfirmDialog';
-import { EditUserModal } from './components/EditUserModal';
+import { EditUserModal } from './components/EditAdminModal';
+import { CreateSudoModal } from './components/CreateAdminModal';
 export default function Admin() {
   const [
     openDeleteUserConfirmationDialog,
     setOpenDeleteUserConfirmationDialog,
   ] = useState(false);
   const [openEditUserModal, setOpenEditUserModal] = useState(false);
+  const [openCreateSudoModal, setOpenCreateSudoModal] = useState(false);
 
   const [userSelected, setUserSelected] = useState<User>();
   const { setPageDetails } = useTopBar();
-  const [users, setUsers] = useState<User[]>([]);
-
-  async function getUsers() {
-    const listUsersRequest = usersService.listAllUsers();
+  const [admins, setUsers] = useState<User[]>([]);
+  const [actualAdmin, setActualAdmin] = useState<User>();
+  async function getAdmins() {
+    const listUsersRequest = usersService.listAllAdmins();
     toast.promise(listUsersRequest, {
-      pending: 'Listing Users',
-      success: 'Users Listed with Sucess',
-      error: 'Could not List Users',
+      pending: 'Listing Sudos',
+      success: 'Sudos Listed with Sucess',
+      error: 'Could not List Sudos',
     });
     const users = await listUsersRequest;
     setUsers(users);
+  }
+
+  async function getAdmin() {
+    try {
+      const actualAdmin = await usersService.findUser();
+      setActualAdmin(actualAdmin);
+      console.log(actualAdmin);
+    } catch (err) {}
   }
 
   useEffect(() => {
     setPageDetails({
       pageName: 'Users',
     });
-    getUsers();
+    getAdmin();
+    getAdmins();
   }, []);
 
   return (
     <>
       <div className="card-container mb-4">
-        <h1 className="text-4xl flex justify-center items-center">
-          List of Users
-        </h1>
+        <div className="flex justify-center">
+          <h1 className="text-4xl w-full justify-end flex">List of Sudos</h1>
+          <div className="w-[68%] flex justify-end items-top">
+            <button
+              className="button-flat px-4 py-2"
+              onClick={() => {
+                setUserSelected(undefined);
+                setOpenCreateSudoModal(true);
+              }}
+            >
+              Create new Sudo
+            </button>
+          </div>
+        </div>
       </div>
       <div className="card-container overflow-auto min-h-full">
         <table>
@@ -55,39 +77,47 @@ export default function Admin() {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
+            {admins.map((admin) => (
               <tr
                 className="border-y border-emerald-500 even:bg-emerald-50 dark:even:bg-emerald-900"
-                key={user.email}
+                key={admin.email}
               >
                 <td className="whitespace-nowrap py-2  px-8 text-center ">
-                  {user.email}
+                  {admin.email}
                 </td>
                 <td className="whitespace-nowrap py-2  px-8 text-center">
-                  {user.issued}
+                  {admin.issued}
                 </td>
                 <td className="whitespace-nowrap py-2  px-8 text-center">
-                  {user.lastLogin}
+                  {admin.lastLogin}
                 </td>
                 <td className="whitespace-nowrap py-2  px-8 text-center flex justify-center gap-4">
-                  <button
-                    className="button-danger-flat px-4 py-2"
-                    onClick={() => {
-                      setUserSelected(user);
-                      setOpenDeleteUserConfirmationDialog(true);
-                    }}
-                  >
-                    <MdDelete />
-                  </button>
-                  <button
-                    className="button-warning-flat px-4 py-2"
-                    onClick={() => {
-                      setUserSelected(user);
-                      setOpenEditUserModal(true);
-                    }}
-                  >
-                    <MdEditSquare />
-                  </button>
+                  {admin.email === actualAdmin?.email ? (
+                    <div className="px-4 py-2">
+                      Nothing to do with your user
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        className="button-danger-flat px-4 py-2"
+                        onClick={() => {
+                          setUserSelected(admin);
+                          setOpenDeleteUserConfirmationDialog(true);
+                        }}
+                      >
+                        <MdDelete />
+                      </button>
+                      <button
+                        className="button-warning-flat px-4 py-2"
+                        onClick={() => {
+                          setUserSelected(admin);
+                          setOpenEditUserModal(true);
+                        }}
+                      >
+                        <MdEditSquare />
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
             ))}
@@ -111,7 +141,7 @@ export default function Admin() {
             success: `Delete user ${userSelected.email} with success`,
           });
           await sudoDeleteUserRequest;
-          await getUsers();
+          await getAdmins();
           setUserSelected(undefined);
           setOpenDeleteUserConfirmationDialog(false);
         }}
@@ -124,8 +154,13 @@ export default function Admin() {
       <EditUserModal
         open={openEditUserModal}
         onClose={() => setOpenEditUserModal(false)}
-        user={userSelected}
-        refetchUsers={getUsers}
+        admin={userSelected}
+        refetchAdmins={getAdmins}
+      />
+      <CreateSudoModal
+        open={openCreateSudoModal}
+        onClose={() => setOpenCreateSudoModal(false)}
+        refetchAdmins={getAdmins}
       />
       <ToastContainer />
     </>

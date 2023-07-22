@@ -1,6 +1,6 @@
 import axios from '@/lib/axios.setup'
 import { User } from '@/models/data/user';
-import { TLoginUserRequest, TSignupUserRequest, TUpdateUserRequest } from '@/models/requests/userRequests';
+import { TCreateAdminRequest, TLoginUserRequest, TSignupUserRequest, TUpdateUserRequest } from '@/models/requests/userRequests';
 
 
 
@@ -8,6 +8,9 @@ async function checkIsAdmin(): Promise<boolean> {
     return (await axios.get("/users/isAdmin")).data;
 }
 
+async function createAdmin(createAdminRequest: TCreateAdminRequest): Promise<void> {
+    return await axios.post("/users/new/admin", createAdminRequest)
+}
 
 async function deleteTargetUser(id: string): Promise<boolean> {
     return (await axios.delete(`/users/delete/${id}`)).data;
@@ -47,6 +50,7 @@ async function updateUser(update: TUpdateUserRequest): Promise<string> {
 
 const service = {
     checkIsAdmin,
+    createAdmin,
     deleteTargetUser,
     deleteUser,
     findUser,

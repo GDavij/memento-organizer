@@ -5,6 +5,8 @@ import {
   MdAccountBox,
   MdExitToApp,
   MdSupervisedUserCircle,
+  MdAdminPanelSettings,
+  MdEngineering,
 } from 'react-icons/md';
 import { ReactElement, useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -43,6 +45,12 @@ const routes: TNavigationMenu[] = [
     href: 'admin/users',
     name: 'Users',
     icon: () => <MdSupervisedUserCircle />,
+    roles: [EUserRole.Admin],
+  },
+  {
+    href: 'admin/sudos',
+    name: 'Sudos',
+    icon: () => <MdEngineering />,
     roles: [EUserRole.Admin],
   },
 ];

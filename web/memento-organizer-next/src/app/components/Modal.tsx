@@ -1,6 +1,6 @@
 //TODO: Implement Acessibility for Modal and implement Lock Focus on Modal
-import React, { ReactNode } from "react";
-import { MdClose } from "react-icons/md";
+import React, { ReactNode } from 'react';
+import { MdClose } from 'react-icons/md';
 
 export type BaseModalProps = {
   open: boolean;
