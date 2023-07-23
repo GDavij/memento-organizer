@@ -106,48 +106,55 @@ export default function Notes() {
     }>();
 
     for (let i = 0; i < history.undos.length; i++) {
-      const undoOperationsFirst = history.undos[i]?.operations[0];
-      const undoOperationsSecond = history.undos[i]?.operations[1];
-      if (
-        undoOperationsFirst.type === 'remove_node' &&
-        (undoOperationsFirst.node as TBaseNoteData).type === 'image' &&
-        undoOperationsSecond?.type === 'insert_node' &&
-        (undoOperationsSecond.node as TBaseNoteData).type === 'image'
-      ) {
-        continue;
-      } else if (
-        undoOperationsFirst.type === 'remove_node' &&
-        (undoOperationsFirst.node as TBaseNoteData).type === 'image'
-      ) {
-        imagesToDelete.add({
-          historyPos: i,
-          historyType: 'undo',
-          node: undoOperationsFirst.node as TBaseNoteData,
-        });
+      const undo = history.undos[i];
+      for (let j = 0; j < undo.operations.length; j++) {
+        const undoOperationsFirst = undo.operations[j];
+        const undoOperationsSecond = undo.operations[j + 1];
+
+        if (
+          undoOperationsFirst.type === 'remove_node' &&
+          (undoOperationsFirst.node as TBaseNoteData).type === 'image' &&
+          undoOperationsSecond?.type === 'insert_node' &&
+          (undoOperationsSecond.node as TBaseNoteData).type === 'image'
+        ) {
+          continue;
+        } else if (
+          undoOperationsFirst.type === 'remove_node' &&
+          (undoOperationsFirst.node as TBaseNoteData).type === 'image'
+        ) {
+          imagesToDelete.add({
+            historyPos: i,
+            historyType: 'undo',
+            node: undoOperationsFirst.node as TBaseNoteData,
+          });
+        }
       }
     }
 
     for (let i = 0; i < history.redos.length; i++) {
-      const redoOperationsFirst = history.redos[i]?.operations[0];
-      const redoOperationsSecond = history.redos[i]?.operations[1];
+      const redos = history.redos[i];
+      for (let j = 0; j < redos.operations.length; j++) {
+        const redoOperationsFirst = redos.operations[j];
+        const redoOperationsSecond = redos.operations[j + 1];
 
-      //! have done This to Mitigate a minimal chance of error that re-upload image on Redo
-      if (
-        redoOperationsFirst.type === 'remove_node' &&
-        (redoOperationsFirst.node as TBaseNoteData).type === 'image' &&
-        redoOperationsSecond?.type === 'insert_node' &&
-        (redoOperationsSecond.node as TBaseNoteData).type === 'image'
-      ) {
-        continue;
-      } else if (
-        redoOperationsFirst.type === 'insert_node' &&
-        (redoOperationsFirst.node as TBaseNoteData).type === 'image'
-      ) {
-        imagesToDelete.add({
-          historyPos: i,
-          historyType: 'redo',
-          node: redoOperationsFirst.node as TBaseNoteData,
-        });
+        //! have done This to Mitigate a minimal chance of error that re-upload image on Redo
+        if (
+          redoOperationsFirst.type === 'remove_node' &&
+          (redoOperationsFirst.node as TBaseNoteData).type === 'image' &&
+          redoOperationsSecond?.type === 'insert_node' &&
+          (redoOperationsSecond.node as TBaseNoteData).type === 'image'
+        ) {
+          continue;
+        } else if (
+          redoOperationsFirst.type === 'insert_node' &&
+          (redoOperationsFirst.node as TBaseNoteData).type === 'image'
+        ) {
+          imagesToDelete.add({
+            historyPos: i,
+            historyType: 'redo',
+            node: redoOperationsFirst.node as TBaseNoteData,
+          });
+        }
       }
     }
 
