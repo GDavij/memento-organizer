@@ -20,7 +20,6 @@ export function TextEditorImage(props: TTextEditorImageProps) {
 
   const url = props.renderProps.element.url!;
   const imageB64 = hasCached(url);
-  //
 
   const path = ReactEditor.findPath(props.editor, props.renderProps.element);
 
@@ -73,7 +72,7 @@ export function TextEditorImage(props: TTextEditorImageProps) {
         className="flex w-full h-fit items-start cursor-grab justify-center px-8"
       >
         {/* eslint-disable-next-line @next/next/no-img-element*/}
-        <div className="w-full h-full  border-4 rounded-lg border-slate-300 dark:border-slate-800 bg-slate-300 dark:bg-slate-800">
+        <div className="w-fit h-full  border-4 rounded-lg border-slate-300 dark:border-slate-800 bg-slate-300 dark:bg-slate-800">
           <img
             src={'data:image/jpeg;base64,' + imageB64!}
             alt={`Image ${url} Could not be loaded or is unavaible`}

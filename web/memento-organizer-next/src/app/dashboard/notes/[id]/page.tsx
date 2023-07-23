@@ -105,31 +105,48 @@ export default function Notes() {
       node: TBaseNoteData;
     }>();
 
-    // Itinerate over undo operations;
     for (let i = 0; i < history.undos.length; i++) {
-      const undoOperations = history.undos[i]?.operations[0];
+      const undoOperationsFirst = history.undos[i]?.operations[0];
+      const undoOperationsSecond = history.undos[i]?.operations[1];
       if (
-        undoOperations.type === 'remove_node' &&
-        (undoOperations.node as TBaseNoteData).type === 'image'
+        undoOperationsFirst.type === 'remove_node' &&
+        (undoOperationsFirst.node as TBaseNoteData).type === 'image' &&
+        undoOperationsSecond?.type === 'insert_node' &&
+        (undoOperationsSecond.node as TBaseNoteData).type === 'image'
+      ) {
+        continue;
+      } else if (
+        undoOperationsFirst.type === 'remove_node' &&
+        (undoOperationsFirst.node as TBaseNoteData).type === 'image'
       ) {
         imagesToDelete.add({
           historyPos: i,
           historyType: 'undo',
-          node: undoOperations.node as TBaseNoteData,
+          node: undoOperationsFirst.node as TBaseNoteData,
         });
       }
     }
-    //Itinerate over redo operations;
+
     for (let i = 0; i < history.redos.length; i++) {
-      const redoOperations = history.redos[i]?.operations[0];
+      const redoOperationsFirst = history.redos[i]?.operations[0];
+      const redoOperationsSecond = history.redos[i]?.operations[1];
+
+      //! have done This to Mitigate a minimal chance of error that re-upload image on Redo
       if (
-        redoOperations.type === 'insert_node' &&
-        (redoOperations.node as TBaseNoteData).type === 'image'
+        redoOperationsFirst.type === 'remove_node' &&
+        (redoOperationsFirst.node as TBaseNoteData).type === 'image' &&
+        redoOperationsSecond?.type === 'insert_node' &&
+        (redoOperationsSecond.node as TBaseNoteData).type === 'image'
+      ) {
+        continue;
+      } else if (
+        redoOperationsFirst.type === 'insert_node' &&
+        (redoOperationsFirst.node as TBaseNoteData).type === 'image'
       ) {
         imagesToDelete.add({
           historyPos: i,
           historyType: 'redo',
-          node: redoOperations.node as TBaseNoteData,
+          node: redoOperationsFirst.node as TBaseNoteData,
         });
       }
     }
