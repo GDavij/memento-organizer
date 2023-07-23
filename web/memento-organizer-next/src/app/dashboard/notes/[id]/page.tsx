@@ -99,102 +99,81 @@ export default function Notes() {
       content: JSON.stringify(editorContext.noteContent),
     };
     const history = editorContext.editor!.history;
-    let undosImagesToDelete = new Array<{
+    const imagesToDelete = new Set<{
       historyPos: number;
+      historyType: 'undo' | 'redo';
       node: TBaseNoteData;
     }>();
+
     for (let i = 0; i < history.undos.length; i++) {
-      const undoOperations = history.undos[i]?.operations[0];
-      if (
-        undoOperations.type === 'remove_node' &&
-        (undoOperations.node as TBaseNoteData).type === 'image'
-      ) {
-        undosImagesToDelete.push({
-          historyPos: i,
-          node: undoOperations.node as TBaseNoteData,
-        });
-      }
-    }
+      const undo = history.undos[i];
+      for (let j = 0; j < undo.operations.length; j++) {
+        const undoOperationsFirst = undo.operations[j];
+        const undoOperationsSecond = undo.operations[j + 1];
 
-    for (let i = 0; i < undosImagesToDelete.length; i++) {
-      const imageUrl = undosImagesToDelete[i].node.url!;
-      //Wrap in a `TryCatch` block because it isn't clearing
-      if (!hasCached(imageUrl)) {
-        continue;
-      }
-      try {
-        const hasBeenDeleted = await s3ImageStorageService.deleteImage(
-          imageUrl
-        );
-        if (hasBeenDeleted) {
-          toast.success(`Deleted Image ${imageUrl} from Note`);
-          removeCache(imageUrl);
-        } else {
-          toast.error(`Could not delete Image ${imageUrl} from Note`);
+        if (
+          undoOperationsFirst.type === 'remove_node' &&
+          (undoOperationsFirst.node as TBaseNoteData).type === 'image' &&
+          undoOperationsSecond?.type === 'insert_node' &&
+          (undoOperationsSecond.node as TBaseNoteData).type === 'image'
+        ) {
+          continue;
+        } else if (
+          undoOperationsFirst.type === 'remove_node' &&
+          (undoOperationsFirst.node as TBaseNoteData).type === 'image'
+        ) {
+          imagesToDelete.add({
+            historyPos: i,
+            historyType: 'undo',
+            node: undoOperationsFirst.node as TBaseNoteData,
+          });
         }
-      } catch (er) {
-        toast.error(`Could not delete Image ${imageUrl} No Acess`);
       }
     }
-
-    const redosImagesToDelete = new Array<{
-      historyPos: number;
-      node: TBaseNoteData;
-    }>();
 
     for (let i = 0; i < history.redos.length; i++) {
-      const redoOperations = history.redos[i]?.operations[0];
-      if (
-        redoOperations.type === 'insert_node' &&
-        (redoOperations.node as TBaseNoteData).type === 'image'
-      ) {
-        redosImagesToDelete.push({
-          historyPos: i,
-          node: redoOperations.node as TBaseNoteData,
-        });
-      }
-    }
-    for (let i = 0; i < redosImagesToDelete.length; i++) {
-      const imageUrl = redosImagesToDelete[i].node.url!;
-      //Wrap in a `TryCatch` block because it isn't clearing
-      if (!hasCached(imageUrl)) {
-        continue;
-      }
-      try {
-        const hasBeenDeleted = await s3ImageStorageService.deleteImage(
-          imageUrl
-        );
-        if (hasBeenDeleted) {
-          toast.success(`Deleted Image ${imageUrl} from Note`);
-          removeCache(imageUrl);
-        } else {
-          toast.error(`Could not delete Image ${imageUrl} from Note`);
+      const redos = history.redos[i];
+      for (let j = 0; j < redos.operations.length; j++) {
+        const redoOperationsFirst = redos.operations[j];
+        const redoOperationsSecond = redos.operations[j + 1];
+
+        //! have done This to Mitigate a minimal chance of error that re-upload image on Redo
+        if (
+          redoOperationsFirst.type === 'remove_node' &&
+          (redoOperationsFirst.node as TBaseNoteData).type === 'image' &&
+          redoOperationsSecond?.type === 'insert_node' &&
+          (redoOperationsSecond.node as TBaseNoteData).type === 'image'
+        ) {
+          continue;
+        } else if (
+          redoOperationsFirst.type === 'insert_node' &&
+          (redoOperationsFirst.node as TBaseNoteData).type === 'image'
+        ) {
+          imagesToDelete.add({
+            historyPos: i,
+            historyType: 'redo',
+            node: redoOperationsFirst.node as TBaseNoteData,
+          });
         }
-      } catch (er) {
-        toast.error(`Could not delete Image ${imageUrl} No Acess`);
       }
     }
 
-    for (let i = 0; i < undosImagesToDelete.length; i++) {
-      const imageUrl = undosImagesToDelete[i].node.url!;
-      //Wrap in a `TryCatch` block because it isn't clearing
-      if (!hasCached(imageUrl)) {
-        continue;
-      }
+    imagesToDelete.forEach(async (toDelete) => {
+      const imageUrl = toDelete.node.url!;
+      if (!hasCached(imageUrl)) return;
+
       try {
-        const hasBeenDeleted = await s3ImageStorageService.deleteImage(
-          imageUrl
-        );
-        if (hasBeenDeleted) {
-          toast.success(`Deleted Image ${imageUrl} from Note`);
-          removeCache(imageUrl);
-        } else {
-          toast.error(`Could not delete Image ${imageUrl} from Note`);
-        }
-      } catch (er) {
-        toast.error(`Could not delete Image ${imageUrl} No Acess`);
-      }
-    }
+        const hasBeenDeletedRequest =
+          s3ImageStorageService.deleteImage(imageUrl);
+        toast.promise(hasBeenDeletedRequest, {
+          pending: `Deleting Image ${imageUrl}`,
+          error: `Could not delete Image ${imageUrl}`,
+          success: `Delete image ${imageUrl} with Sucess`,
+        });
+        const hasBeenDeleted = await hasBeenDeletedRequest;
+        if (hasBeenDeleted) removeCache(imageUrl);
+      } catch (err) {}
+    });
 
     await notesService.updateNote(noteId, updateRequest);
     setIsSavingNote(false);
