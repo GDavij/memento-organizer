@@ -1,0 +1,13 @@
+version: '1'
+name: memento-organizer-development-services
+services:
+  database:
+    image: mongo:latest
+    container_name: 'memento-organizer-mongo-database'
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: '${MementoDbaUser}'
+      MONGO_INITDB_ROOT_PASSWORD: '${MementoDbaPassword}'
+    volumes:
+      - ./mongo-database-data:/var/lib/mysql
