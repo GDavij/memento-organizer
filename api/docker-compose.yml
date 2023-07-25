@@ -10,4 +10,4 @@ services:
       MONGO_INITDB_ROOT_USERNAME: '${MementoDbaUser}'
       MONGO_INITDB_ROOT_PASSWORD: '${MementoDbaPassword}'
     volumes:
-      - ./mongo-database-data:/var/lib/mysql
+      - ./mongo-database-data:/data/db
