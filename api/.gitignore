@@ -1,6 +1,12 @@
 
 # Created by https://www.gitignore.io/api/macos,linux,windows,sublimetext,dotsettings,visualstudio,visualstudiocode
 
+# Environment Variables
+.env
+
+# Docker Data
+mongo-database-data
+
 ### DotSettings ###
 *.DotSettings
 ### Linux ###
