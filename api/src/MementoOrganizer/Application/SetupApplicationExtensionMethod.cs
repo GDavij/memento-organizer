@@ -19,6 +19,8 @@ using FluentValidation.AspNetCore;
 using Amazon.S3;
 using MementoOrganizer.Infrastructure.Repositories.AWSS3;
 using Amazon.S3.Model;
+using System.IO;
+using System;
 
 namespace MementoOrganizer.Application;
 
@@ -59,6 +61,31 @@ public static class SetupApplicationExtensionMethod
             .AddScoped<IValidator<CreateNoteRequest>, CreateNoteRequestValidator>()
             .AddScoped<IValidator<UpdateTargetUserRequest>, UpdateTargetUserRequestValidator>()
             .AddFluentValidationAutoValidation();
+
+        return services;
+    }
+
+    public static IServiceCollection UseDotenv(this IServiceCollection services)
+    {
+        string[] path = { "../", "../", ".env" };
+        var filePath = Path.Combine(path);
+        if (!File.Exists(filePath))
+        {
+            Console.WriteLine("Missing .Env Path, Exiting Process");
+            Environment.Exit(1);
+        }
+
+        foreach (string line in File.ReadAllLines(filePath))
+        {
+            string[] parts = line
+                    .Replace("\"", String.Empty)
+                    .Split("=", StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length != 2)
+                continue;
+
+            Environment.SetEnvironmentVariable(parts[0], parts[1]);
+        }
 
         return services;
     }
