@@ -56,7 +56,7 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    builder.Services.UseDotenv();
+    app.Environment.UseDotenv();
 }
 
 // app.UseHttpsRedirection(); Remove for CORS Reasons 

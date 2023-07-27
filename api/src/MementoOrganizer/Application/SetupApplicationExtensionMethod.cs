@@ -21,6 +21,7 @@ using MementoOrganizer.Infrastructure.Repositories.AWSS3;
 using Amazon.S3.Model;
 using System.IO;
 using System;
+using Microsoft.AspNetCore.Hosting;
 
 namespace MementoOrganizer.Application;
 
@@ -65,7 +66,7 @@ public static class SetupApplicationExtensionMethod
         return services;
     }
 
-    public static IServiceCollection UseDotenv(this IServiceCollection services)
+    public static void UseDotenv(this IWebHostEnvironment environment)
     {
         string[] path = { "../", "../", ".env" };
         var filePath = Path.Combine(path);
@@ -86,7 +87,6 @@ public static class SetupApplicationExtensionMethod
 
             Environment.SetEnvironmentVariable(parts[0], parts[1]);
         }
-
-        return services;
+        
     }
 }
