@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using MementoOrganizer.Application.Middlewares;
 using MementoOrganizer.Application;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +53,11 @@ builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
 
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.Environment.UseDotenv();
+}
 
 // app.UseHttpsRedirection(); Remove for CORS Reasons 
 //TODO: Resolve those Problems
