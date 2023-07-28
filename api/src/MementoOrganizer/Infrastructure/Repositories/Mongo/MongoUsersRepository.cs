@@ -37,7 +37,16 @@ public class MongoUsersRepository : IUsersRepository<ObjectId>
 
     public async Task<User<ObjectId>?> FindUserByEmail(string email)
     {
-        var filter = Builders<User<ObjectId>>.Filter.Eq(user => user.Email, email);
+        var filterBuilder = Builders<User<ObjectId>>.Filter;
+        var filter = filterBuilder.Eq(user => user.Email, email) & filterBuilder.Eq(user => user.IsAdmin, false);
+        var query = _usersCollection.Find(filter).FirstOrDefaultAsync();
+        return await query;
+    }
+
+    public async Task<User<ObjectId>?> FindAdminByEmail(string email)
+    {
+        var filterBuilder = Builders<User<ObjectId>>.Filter;
+        var filter = filterBuilder.Eq(user => user.Email, email) & filterBuilder.Eq(user => user.IsAdmin, true);
         var query = _usersCollection.Find(filter).FirstOrDefaultAsync();
         return await query;
     }

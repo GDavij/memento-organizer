@@ -40,6 +40,14 @@ public class UsersController : ControllerBase
         string token = await _userService.LoginUser(loginUserRequest);
         return Ok(new { token });
     }
+    
+    [HttpPost]
+    [Route("login/admin")]
+    public async Task<IActionResult> LoginAdmin([FromBody()] LoginAdminRequest loginAdminRequest)
+    {
+        string token = await _userService.LoginAdmin(loginAdminRequest);
+        return Ok(new { token });
+    }
 
     [HttpDelete]
     [Route("delete")]

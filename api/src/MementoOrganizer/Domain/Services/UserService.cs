@@ -34,9 +34,9 @@ public class UserService : IUserService
 
     public async Task CreateAdmin(CreateAdminRequest createAdminRequest)
     {
-        if (await _mongoUsersRepository.FindUserByEmail(createAdminRequest.Email!) != null)
+        if (await _mongoUsersRepository.FindAdminByEmail(createAdminRequest.Email!) != null)
         {
-            throw new Exception("User Already Exists");
+            throw new Exception("Admin Already Exists");
         }
 
         bool existsAnyAdmin = await _mongoUsersRepository.ExistsAnyAdmin();
@@ -217,6 +217,19 @@ public class UserService : IUserService
             return admins.ToListUserResponse();
         }
         throw new Exception("Access Denied");
+    }
+
+    public async Task<string> LoginAdmin(LoginAdminRequest loginAdminRequest)
+    {
+        User<ObjectId>? databaseUser = await _mongoUsersRepository.FindAdminByEmail(loginAdminRequest.Email!);
+        if (databaseUser == null)
+            throw new Exception("Admin Not Found");
+
+        string derivedPassphrase = _securityService.DerivePassphrase(loginAdminRequest.Passphrase!, databaseUser.Issued.ToString());
+        if (!databaseUser.Passphrase.Equals(derivedPassphrase))
+            throw new Exception("Admin Could not be Authenticated");
+
+        return _securityService.GenerateToken(databaseUser.Id, databaseUser.Passphrase);
     }
 
     public async Task<string> LoginUser(LoginUserRequest loginUserRequest)

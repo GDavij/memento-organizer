@@ -58,6 +58,7 @@ public static class SetupApplicationExtensionMethod
             .AddScoped<IValidator<CreateAdminRequest>, CreateAdminRequestValidator>()
             .AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValidator>()
             .AddScoped<IValidator<LoginUserRequest>, LoginUserRequestValidator>()
+            .AddScoped<IValidator<LoginAdminRequest>, LoginAdminRequestValidator>()
             .AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>()
             .AddScoped<IValidator<CreateNoteRequest>, CreateNoteRequestValidator>()
             .AddScoped<IValidator<UpdateTargetUserRequest>, UpdateTargetUserRequestValidator>()

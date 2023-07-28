@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MementoOrganizer.Domain.Entities;
 using MementoOrganizer.Domain.Models.Requests.Users;
 using MementoOrganizer.Domain.Models.Responses.Users;
 
@@ -17,6 +16,7 @@ public interface IUserService
     public Task<List<UserResponse>> ListAllUsers(string token);
     public Task<bool> DeleteTargetUser(string token, string id);
     public Task<bool> UpdateTargetUser(string token, string id, UpdateTargetUserRequest updateTargetUserRequest);
+    public Task<string> LoginAdmin(LoginAdminRequest loginAdminRequest);
     public Task<string> LoginUser(LoginUserRequest loginUserRequest);
     public Task<string> UpdateUser(string token, UpdateUserRequest updateUserRequest);
 }
