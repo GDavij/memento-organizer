@@ -62,9 +62,7 @@ export function CreateSudoModal({
       await refetchAdmins();
       setIsUpdatingSudo(false);
       onClose();
-    } catch (err) {
-      console.log('Could not create');
-    }
+    } catch (err) {}
     setIsUpdatingSudo(false);
   }
 

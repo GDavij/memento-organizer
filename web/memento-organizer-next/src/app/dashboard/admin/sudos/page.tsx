@@ -36,7 +36,6 @@ export default function Admin() {
     try {
       const actualAdmin = await usersService.findUser();
       setActualAdmin(actualAdmin);
-      console.log(actualAdmin);
     } catch (err) {}
   }
 
