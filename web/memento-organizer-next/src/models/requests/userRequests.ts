@@ -3,6 +3,11 @@ export type TUpdateUserRequest = {
     passphrase?: string
 }
 
+export type TLoginAdminRequest = {
+    email?: string,
+    passphrase?: string
+}
+
 export type TLoginUserRequest = {
     email?: string,
     passphrase?: string

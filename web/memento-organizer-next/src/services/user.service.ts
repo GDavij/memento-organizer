@@ -1,6 +1,6 @@
 import axios from '@/lib/axios.setup'
 import { User } from '@/models/data/user';
-import { TCreateAdminRequest, TLoginUserRequest, TSignupUserRequest, TUpdateUserRequest } from '@/models/requests/userRequests';
+import { TCreateAdminRequest, TLoginAdminRequest, TLoginUserRequest, TSignupUserRequest, TUpdateUserRequest } from '@/models/requests/userRequests';
 
 
 
@@ -36,6 +36,10 @@ async function loginUser(login: TLoginUserRequest): Promise<string> {
     return (await axios.post<{ token: string }>("/users/login", login)).data.token;
 }
 
+async function loginAdmin(login: TLoginAdminRequest): Promise<string> {
+    return (await axios.post<{ token: string }>("/users/login/admin", login)).data.token;
+}
+
 async function signUpUser(enrollment: TSignupUserRequest): Promise<void> {
     return await axios.post("/users/new", enrollment);
 }
@@ -56,6 +60,7 @@ const service = {
     findUser,
     listAllAdmins,
     listAllUsers,
+    loginAdmin,
     loginUser,
     signUpUser,
     updateTargetUser,

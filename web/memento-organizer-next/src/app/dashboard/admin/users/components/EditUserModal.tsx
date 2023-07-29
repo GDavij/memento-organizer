@@ -35,7 +35,6 @@ export function EditUserModal({
   useEffect(() => {
     reset();
     if (user) {
-      console.log('Update');
       setValue('email', user.email);
     }
   }, [open]);

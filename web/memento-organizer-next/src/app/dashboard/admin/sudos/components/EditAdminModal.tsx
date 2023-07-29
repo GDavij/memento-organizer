@@ -35,13 +35,11 @@ export function EditUserModal({
   useEffect(() => {
     reset();
     if (admin) {
-      console.log('Update');
       setValue('email', admin.email);
     }
   }, [open]);
 
   async function editUser(formData: TEditSudoFormData) {
-    console.log(formData);
     if (formData.passphrase && formData.passphrase.length < 16) {
       toast.error('Passphrase has less than 16 characters');
       return;
@@ -64,7 +62,6 @@ export function EditUserModal({
     if (!passphrase) passphrase = undefined;
 
     setIsUpdatingSudo(true);
-    console.log({ email, passphrase });
     try {
       const updateTargetUserRequest = usersService.updateTargetUser(admin!.id, {
         email,

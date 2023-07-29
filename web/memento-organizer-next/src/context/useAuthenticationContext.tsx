@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 type TAuthenticationContext = {
   login: (email: string, password: string) => Promise<void>;
+  loginAsAdmin: (email:string, password: string) => Promise<void>;
   logout: () => void;
   signup: (email: string, password: string) => Promise<void>;
   isAdmin: boolean | null;
@@ -48,6 +49,21 @@ export function AutheticationProvider({ children }: TBackdropProps) {
     } catch (err) {}
   }
 
+  async function loginAsAdmin(email: string, passphrase: string) {
+    try {
+      const loginUserRequest = usersService.loginAdmin({ email, passphrase });
+      toast.promise(loginUserRequest, {
+        pending: 'Logging user',
+        success: 'User logged with sucess',
+        error: 'Email or password is invalid',
+      });
+      const token = await loginUserRequest;
+      localStorage.setItem('token', token);
+      await getIsAdmin();
+      return router.push('/dashboard/home');
+    } catch (err) {}
+  }
+
   function logout() {
     localStorage.clear();
     return router.push('/');
@@ -70,7 +86,7 @@ export function AutheticationProvider({ children }: TBackdropProps) {
     getIsAdmin();
   }, []);
   return (
-    <AuthenticationContext.Provider value={{ login, logout, signup, isAdmin }}>
+    <AuthenticationContext.Provider value={{ login, loginAsAdmin, logout, signup, isAdmin }}>
       {children}
     </AuthenticationContext.Provider>
   );
