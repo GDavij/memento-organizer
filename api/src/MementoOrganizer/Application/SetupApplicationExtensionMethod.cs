@@ -83,7 +83,7 @@ public static class SetupApplicationExtensionMethod
                     .Replace("\"", String.Empty)
                     .Split("=", StringSplitOptions.RemoveEmptyEntries);
 
-            if (parts.Length > 2)
+            if (parts.Length >= 2)
             {
                 //Using For Connections Strings
                 for (int i = 2; i < parts.Length; i++)
@@ -92,11 +92,6 @@ public static class SetupApplicationExtensionMethod
                 }
                 Environment.SetEnvironmentVariable(parts[0], parts[1]);
             }
-            
-            if (parts.Length != 2)
-                continue;
-
-            Environment.SetEnvironmentVariable(parts[0], parts[1]);
         }
         
     }
