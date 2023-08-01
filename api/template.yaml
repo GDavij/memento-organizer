@@ -7,6 +7,34 @@ Description: >
 Globals:
   Function:
     Timeout: 100
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+      AllowHeaders: "'content-type,authorization'"
+      AllowOrigin: "'*'"
+
+Parameters:
+    MementoOrganizerMongoConnectionStr: 
+      Type: String
+      Description: Connection String For The Database
+    mementoOrganizerWebProductionURL: 
+      Type: String
+      Description: Url For the Frontend of the Application used to Limit Access to the Backend via Cors 
+    MementoAwsAccessKeyId: 
+      Type: String
+      Description: AwsAccessKey Used to Access S3
+    MementoAwsSecretAccessKey:
+      Type: String
+      Description: AwsSecretAccessKey Used to Authenticate To AwsS3
+    MementoOrganizerS3BucketName: 
+      Type: String
+      Description: Name Of The S3 Bucket
+    MementoDbaUsername: 
+      Type: String
+      Description: Name Of The User That Gonna Authenticate to Database
+    MementoDbaPassword:
+      Type: String
+      Description: Password of The User That Gonna Authenticate To Database
 
 Resources:
   NetCodeWebAPIServerless:
@@ -19,7 +47,13 @@ Resources:
       MemorySize: 1024
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
-          MementoOrganizerMongoConnectionStr: !Ref MementoOrganizerMongoProductionConnectionStr
+          MementoOrganizerMongoConnectionStr: !Ref MementoOrganizerMongoConnectionStr
+          mementoOrganizerWebProductionURL: http://localhost:3000
+          MementoAwsAccessKeyId: !Ref MementoAwsAccessKeyId
+          MementoAwsSecretAccessKey: !Ref MementoAwsSecretAccessKey
+          MementoOrganizerS3BucketName: !Ref MementoOrganizerS3BucketName
+          MementoDbaUsername: !Ref MementoDbaUsername
+          MementoDbaPassword: !Ref MementoDbaPassword
       Events:
         ProxyResource:
           Type: HttpApi
