@@ -19,8 +19,7 @@ public record NoteResponse
         string description,
         string content,
         DateTime issued,
-        DateTime lastUpdate
-    )
+        DateTime lastUpdate)
     {
         Id = id;
         Owner = owner;
