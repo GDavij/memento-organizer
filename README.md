@@ -1,4 +1,4 @@
-## Memento Organizer Documentation - V: 0.1.0 Alpha
+## Memento Organizer Documentation - V: 0.1.1 Alpha
 
 **Index**
 
@@ -25,14 +25,14 @@
 > Still is already usable and it can be safely deployed.  
 > Since this project is characterized as a personal project at the moment don't expect those missing features to be available ASAP since i work on it on my free time
 
-If you wanna know some mapped features and issues you can go to the [Issues Page on this Github](https://github.com/GDavij/memento-organizer/issues) to know more about it
+If you wanna know some mapped features and issues you can go to the [Issues Page on this Github Repository](https://github.com/GDavij/memento-organizer/issues) to know more about it
 
 ### Features
 
 In This actual state we already have those functionalities
 
 - Capability to write notes
-- Security in all non public data like password, the content of your notes, and etc… (AES 256 And PBDKF2)
+- Security in all non public data like password, the content of your notes, and etc… (AES 256 And [PBKDF2](https://en.wikipedia.org/wiki/PBKDF2))
 - Capability to Filter notes by (Something to Improve)
   - Id
   - Name
@@ -47,7 +47,7 @@ In This actual state we already have those functionalities
 
 ### Missing
 
-keep in mind that the features missing that are here listed are all for the actual moment of the project it can change depending of the path this project will take.
+> keep in mind that the features missing that are here listed are all for the actual moment of the project it can change depending of the path this project will take.
 
 - Kanban
 
@@ -69,9 +69,9 @@ keep in mind that the features missing that are here listed are all for the actu
 
   - Ability to open various notes like you could do on your browser for better productivity
 
-- Testes(Unit, Integration and E2E)
+- Tests(Unit, Integration and E2e)
 
-  - Map services and ensure that one new feature don't break when modifying or adding a new one
+  - Map services and ensure that one existing feature don't break when modifying or adding a new one
 
 - Graphs
   - Statics and Graphs for showing data like links between notes/documents, words/phrases
@@ -111,12 +111,20 @@ This project lifecycle will be live while the ideas for the project keep going a
 - The system must be able to let users modify(CRUD) thoughts sets
 - The system must allow users to open multiple notes/documents and let then switch between then implementing a tabs system
 - The system must collect data for generate values that can be read from graphs and statistics only by the user
+- The system must be able to let users change theirs e-mail and password whenever they want
+- The system must be able to let users delete their account whenever they want
+- The system must be able to let users create their account by then selfs
+- The system must be able to create admins
+- Admins must be able to see existing users in the system
 
 ## Non Functional Requisites
 
 - The system must work online and must be accessed over a [web browser](https://en.wikipedia.org/wiki/Web_browser)
 - All not public data must be securely encrypted
 - All data that is only for verification like `password` must use [passphrase key derivation functions](https://en.wikipedia.org/wiki/Key_derivation_function) like [PBKDF2](https://en.wikipedia.org/wiki/PBKDF2) instead of just [hash functions](https://en.wikipedia.org/wiki/Cryptographic_hash_function) like [SHA512](https://en.wikipedia.org/wiki/SHA-2)
+- The first admin of the system must be created without a admin token
+- If already exist an admin in the system, the next admin to be created need the token of an existing admin of the system to be allowed it's creation
+- A note/document, kanban or though set, must not be shared between users
 
 ## Structure of Project
 
@@ -125,8 +133,7 @@ This project lifecycle will be live while the ideas for the project keep going a
 ```
 .
 |-api                           # Represent the Backend of the System
-|--docs                         # Documentation specific aspnetcore api
-|
+|--docs                         # Documentation specific for the aspnetcore api
 |--src                          # Part where the source code is store
 |---MementoOrganizer            # SubFolder for storing the source code
 |----Application                # Layer that has the application logic(validations, configurations, middlewares, etc..)
