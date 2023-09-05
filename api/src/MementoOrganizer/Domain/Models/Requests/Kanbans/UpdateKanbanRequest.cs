@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using MementoOrganizer.Domain.Entities;
 
-namespace MementoOrganizer.Domain.Models.Requests.Kanban;
+namespace MementoOrganizer.Domain.Models.Requests.Kanbans;
 
 public class UpdateKanbanRequest
 {

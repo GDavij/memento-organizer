@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MementoOrganizer.Domain.Entities;
 using MementoOrganizer.Domain.Extensions;
-using MementoOrganizer.Domain.Models.Requests.Kanban;
+using MementoOrganizer.Domain.Models.Requests.Kanbans;
 using MementoOrganizer.Domain.Models.Responses.Kanbans;
 using MementoOrganizer.Domain.Providers;
 using MementoOrganizer.Domain.Repositories;
 using MementoOrganizer.Domain.Services.Interfaces;
 using MongoDB.Bson;
-using System.Linq;
 
 namespace MementoOrganizer.Domain.Services;
 

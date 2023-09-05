@@ -22,7 +22,7 @@ using Amazon.S3.Model;
 using System.IO;
 using System;
 using Microsoft.AspNetCore.Hosting;
-using MementoOrganizer.Domain.Models.Requests.Kanban;
+using MementoOrganizer.Domain.Models.Requests.Kanbans;
 using MementoOrganizer.Application.Validators.Requests.Kanbans;
 
 namespace MementoOrganizer.Application;

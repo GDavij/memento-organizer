@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MementoOrganizer.Domain.Models.Requests.Kanban;
+namespace MementoOrganizer.Domain.Models.Requests.Kanbans;
 
 public class UpdateKanbanColumnsRequest
 {
@@ -20,7 +20,5 @@ public class ReplaceKanbanColumnRequest
 {
     public string? Id { get; set; }
     public string? ColumnToReplaceId { get; set; }
-    public string? Name { get; set; }
-
-
+    
 }

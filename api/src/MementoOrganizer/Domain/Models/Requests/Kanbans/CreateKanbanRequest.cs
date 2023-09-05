@@ -1,4 +1,4 @@
-namespace MementoOrganizer.Domain.Models.Requests.Kanban;
+namespace MementoOrganizer.Domain.Models.Requests.Kanbans;
 
 public class CreateKanbanRequest
 {

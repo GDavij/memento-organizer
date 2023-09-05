@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using MementoOrganizer.Domain.Models.Responses.Kanbans;
 using System.Collections.Generic;
-using MementoOrganizer.Domain.Models.Requests.Kanban;
+using MementoOrganizer.Domain.Models.Requests.Kanbans;
 
 namespace MementoOrganizer.Domain.Services.Interfaces;
 

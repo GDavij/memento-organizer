@@ -1,5 +1,5 @@
 using FluentValidation;
-using MementoOrganizer.Domain.Models.Requests.Kanban;
+using MementoOrganizer.Domain.Models.Requests.Kanbans;
 namespace MementoOrganizer.Application.Validators.Requests.Kanbans;
 public class CreateKanbanRequestValidator : AbstractValidator<CreateKanbanRequest>
 {

@@ -1,10 +1,7 @@
-using System;
 using System.Threading.Tasks;
-using MementoOrganizer.Domain.Models.Requests.Kanban;
-using MementoOrganizer.Domain.Services;
+using MementoOrganizer.Domain.Models.Requests.Kanbans;
 using MementoOrganizer.Domain.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 
 namespace MementoOrganizer.Controllers;
 
