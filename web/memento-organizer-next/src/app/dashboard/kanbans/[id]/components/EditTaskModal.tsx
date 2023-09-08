@@ -13,19 +13,24 @@ import {
 } from 'react-icons/md';
 import kanbansService from '@/services/kanbans.service';
 import { toast } from 'react-toastify';
+import { KanbanTask } from '@/models/data/kanban';
 
-interface CreateTaskModalProps extends BaseModalProps {
+interface EditTaskModalProps extends BaseModalProps {
+	columnId?: string;
 	kanbanId: string;
-	columnId: string | undefined;
+	taskId: string | undefined;
 	refetchTasks: () => Promise<void>;
+	updateView: () => Promise<void>;
 }
-export default function CreateTaskModal({
+export default function EditTaskModal({
 	onClose,
 	open,
-	kanbanId,
 	columnId,
+	kanbanId,
+	taskId,
 	refetchTasks,
-}: CreateTaskModalProps) {
+	updateView,
+}: EditTaskModalProps) {
 	const {
 		noteContent,
 		isBold,
@@ -37,14 +42,30 @@ export default function CreateTaskModal({
 		editor,
 	} = useEditor();
 
+	const [task, setTask] = useState<KanbanTask | null>(null);
 	const [name, setName] = useState('');
-	const [isCreating, setIsCreating] = useState(false);
+	const [isUpdating, setIsUpdating] = useState<boolean>(false);
+	const [isFetching, setIsFetching] = useState<boolean>(false);
+
+	async function fetchTask(id: string) {
+		setIsFetching(true);
+		const aux = await kanbansService.getKanbanTaskById(id);
+		setTask(aux);
+		setIsFetching(false);
+		setName(aux!.name);
+	}
 
 	useEffect(() => {
 		setName('');
+		setTask(null);
+
+		if (taskId) fetchTask(taskId);
 	}, [open]);
 
-	async function createTask() {
+	const differentValueOrUndefined = (value: any, equalValue: any) =>
+		value == equalValue ? undefined : value;
+
+	async function updateTask() {
 		if (!name) {
 			toast.error('Missing name to create task');
 			return;
@@ -52,28 +73,29 @@ export default function CreateTaskModal({
 
 		const content = JSON.stringify(noteContent);
 
-		const createPromise = kanbansService.updateKanbanTasks(kanbanId, {
-			add: [
+		const updatePromise = kanbansService.updateKanbanTasks(kanbanId, {
+			add: [],
+			replace: [
 				{
-					name,
-					content,
-					column: columnId,
+					id: task!.id,
+					name: differentValueOrUndefined(name, task!.name),
+					content: differentValueOrUndefined(content, task!.content),
 				},
 			],
-			replace: [],
 			delete: [],
 		});
 
-		setIsCreating(true);
-		toast.promise(createPromise, {
+		setIsUpdating(true);
+		toast.promise(updatePromise, {
 			success: `Created task \"${name}\" with success`,
 			error: `Could not create task \"${name}\"`,
 			pending: `Creating task \"${name}\"...`,
 		});
-		await createPromise;
+		await updatePromise;
 
 		await refetchTasks();
-		setIsCreating(false);
+		await updateView();
+		setIsUpdating(false);
 		onClose();
 	}
 
@@ -100,14 +122,14 @@ export default function CreateTaskModal({
 		<Modal
 			open={open}
 			onClose={onClose}
-			subject='Create new Task'
-			lockCloseBtn={isCreating}
+			subject='Update Task'
+			lockCloseBtn={isUpdating}
 		>
 			<form
 				className='w-full flex flex-col gap-4'
 				onSubmit={(ev) => {
 					ev.preventDefault();
-					createTask();
+					updateTask();
 				}}
 			>
 				<Input.Root>
@@ -147,20 +169,22 @@ export default function CreateTaskModal({
 							</IconButton.Flat>
 						</div>
 						<div className='w-full h-full px-2'>
-							<SimpleEditorScreen
-								initialNoteContent={[
-									{ type: 'paragraph', children: [{ text: '' }] },
-								]}
-								saveNoteCallback={async () => {}}
-								editorId={editorId}
-							/>
+							{task ? (
+								<SimpleEditorScreen
+									initialNoteContent={JSON.parse(task!.content)}
+									saveNoteCallback={async () => {}}
+									editorId={editorId}
+								/>
+							) : (
+								'Loading...'
+							)}
 						</div>
 					</div>
 				</label>
 
 				<div className='flex justify-end'>
 					<div className='w-full md:w-1/2'>
-						<Button.Flat>Create Task</Button.Flat>
+						<Button.Flat>Update Task</Button.Flat>
 					</div>
 				</div>
 			</form>
