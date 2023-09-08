@@ -7,6 +7,8 @@ import {
 	MdSupervisedUserCircle,
 	MdAdminPanelSettings,
 	MdEngineering,
+	MdTableView,
+	MdViewKanban,
 } from 'react-icons/md';
 import { ReactElement, useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -39,6 +41,12 @@ const routes: TNavigationMenu[] = [
 		href: 'notes',
 		name: 'Notes',
 		icon: () => <MdArticle />,
+		roles: [EUserRole.User],
+	},
+	{
+		href: 'kanbans',
+		name: 'Kanbans',
+		icon: () => <MdViewKanban />,
 		roles: [EUserRole.User],
 	},
 	{
@@ -83,7 +91,7 @@ export function NavigationBar({ hidden }: { hidden: boolean }) {
 			></button>
 			<nav
 				className={` ${
-					hidden ? 'w-4' : 'w-80'
+					hidden ? 'w-0' : 'w-80'
 				}  sm:relative fixed flex-col h-full flex justify-between top-0  bg-white dark:bg-slate-700 drop-shadow-lg rounded-r-lg transition-all duration-500 overflow-hidden z-20`}
 			>
 				<ul
