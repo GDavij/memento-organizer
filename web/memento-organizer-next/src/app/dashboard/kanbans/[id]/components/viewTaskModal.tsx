@@ -13,7 +13,7 @@ import {
 	MdOutlineSquare,
 	MdUpdate,
 } from 'react-icons/md';
-import EditTaskModal from './EditTaskModal';
+import EditTaskModal from './editTaskModal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { toast } from 'react-toastify';
 

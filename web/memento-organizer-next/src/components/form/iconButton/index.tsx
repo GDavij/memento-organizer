@@ -16,6 +16,22 @@ function Flat({ active = true, ...props }: ButtonPrimaryProps) {
 	);
 }
 
+type ButtonCleanProps = ComponentProps<'button'> & {
+	active?: boolean;
+};
+function Clean({ active = true, ...props }: ButtonCleanProps) {
+	return (
+		<button
+			{...props}
+			className={`w-fit h-fit ${
+				active
+					? 'bg-slate-200 dark:bg-slate-600 hover:text-emerald-500 active:text-emerald-400'
+					: 'text-slate-500 dark:text-slate-400 hover:text-emerald-500 active:text-emerald-400'
+			}  p-1 text-sm sm:text-lg font-semibold rounded-lg disabled:text-slate-500 disabled:dark:text-slate-400 disabled:rounded-full disabled:cursor-not-allowed transition-all duration-200`}
+		/>
+	);
+}
+
 type ButtonDangerProps = ComponentProps<'button'>;
 function Danger(props: ButtonDangerProps) {
 	return (
@@ -26,4 +42,4 @@ function Danger(props: ButtonDangerProps) {
 	);
 }
 
-export { Flat, Danger };
+export { Flat, Danger, Clean };

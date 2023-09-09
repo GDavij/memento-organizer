@@ -4,10 +4,20 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import kanbansService from '@/services/kanbans.service';
-import { MdAdd, MdOutlineTableChart } from 'react-icons/md';
+import {
+	MdAdd,
+	MdDelete,
+	MdOutlineTableChart,
+	MdOutlineTune,
+	MdRemove,
+} from 'react-icons/md';
 import * as IconButton from '@/components/form/iconButton';
 import CreateTaskModal from './components/createTaskModal';
 import ViewTaskModal from './components/viewTaskModal';
+import * as Button from '@/components/form/button';
+import CreateColumnModal from './components/createColumnModal';
+import EditKanbanModal from './components/editKanbanModal';
+
 export default function Kanban() {
 	const { id } = useParams();
 
@@ -27,6 +37,9 @@ export default function Kanban() {
 	const [openViewTaskModal, setOpenViewTaskModal] = useState(false);
 	const [taskToView, setTaskToView] = useState<KanbanTask | null>(null);
 
+	const [openCreateColumnModal, setOpenCreateColumnModal] = useState(false);
+	const [openEditKanbanModal, setOpenEditKanbanModal] = useState(false);
+
 	async function fetchTasks() {
 		const auxTasks = await kanbansService.getKanbanTasksById(id);
 		setKanbanTasks(auxTasks);
@@ -36,6 +49,11 @@ export default function Kanban() {
 		const auxKanbans = await kanbansService.getKanbanById(id);
 		setKanban(auxKanbans);
 		fetchTasks();
+	}
+
+	async function refetchKanban() {
+		const auxKanbans = await kanbansService.getKanbanById(id);
+		setKanban(auxKanbans);
 	}
 
 	async function handleTaskDropChange() {}
@@ -93,13 +111,27 @@ export default function Kanban() {
 	}, []);
 	return (
 		<>
-			<div className='w-full h-14 bg-white dark:bg-slate-700 px-3 py-2 md:px-6 md:py-4 drop-shadow-lg rounded-lg '>
+			<div className='w-full min-h-14 bg-white dark:bg-slate-700 px-3 py-2 md:px-6 md:py-4 drop-shadow-lg rounded-lg flex md:flex-row justify-between items-center  flex-col gap-4'>
 				<span className='flex h-full gap-2 items-center'>
 					<MdOutlineTableChart className='text-md md:text-3xl' />
 					<div className='h-6 md:h-8 bg-emerald-500 w-1 rounded-full'></div>
 					<strong className='text-sm md:text-2xl font-bold'>
 						{kanban?.name}
 					</strong>
+					<IconButton.Clean onClick={() => setOpenEditKanbanModal(true)}>
+						<MdOutlineTune className='text-xl' />
+					</IconButton.Clean>
+				</span>
+
+				<span className='flex gap-8'>
+					<div>
+						<Button.Flat>Adjust Columns</Button.Flat>
+					</div>
+					<div>
+						<Button.Flat onClick={() => setOpenCreateColumnModal(true)}>
+							Create New Column
+						</Button.Flat>
+					</div>
 				</span>
 			</div>
 
@@ -115,9 +147,12 @@ export default function Kanban() {
 								handleTaskColumnChange(column.id);
 							}}
 						>
-							<div className='w-full flex flex-col justify-center items-center h-12 mt-2 gap-1 mb-2 sticky top-0'>
-								<span className='flex justify-center items-center gap-4'>
-									<strong className='text-xl'>{column.name}</strong>
+							<div className='w-80 flex flex-col items-center justify-center  h-12 mt-2 gap-1 mb-2 sticky top-0 truncate'>
+								<span className='flex justify-center items-center gap-4 truncate'>
+									<strong className='w-48 text-end truncate text-xl'>
+										<span>{column.name}</span>
+										<div className='w-48 h-1 bg-emerald-500 rounded-lg'></div>
+									</strong>
 									<IconButton.Flat
 										onClick={() => {
 											setColumnToCreateTask(column);
@@ -126,8 +161,10 @@ export default function Kanban() {
 									>
 										<MdAdd />
 									</IconButton.Flat>
+									<IconButton.Danger>
+										<MdDelete />
+									</IconButton.Danger>
 								</span>
-								<div className='w-1/2 h-1 bg-emerald-500 rounded-lg'></div>
 							</div>
 							<div className='flex flex-col w-full min-h-fit overflow-y-auto px-2 py-4 gap-6'>
 								{kanbanTasks
@@ -186,6 +223,18 @@ export default function Kanban() {
 				taskId={taskToView?.id!}
 				kanbanId={id}
 				refetchTasks={fetchTasks}
+			/>
+			<CreateColumnModal
+				open={openCreateColumnModal}
+				onClose={() => setOpenCreateColumnModal(false)}
+				kanbanId={id}
+				kanbanColumns={kanban?.columns}
+				refetchColumn={refetchKanban}
+			/>
+			<EditKanbanModal
+				open={openEditKanbanModal}
+				onClose={() => setOpenEditKanbanModal(false)}
+				kanbanId={id}
 			/>
 			<ToastContainer />
 		</>

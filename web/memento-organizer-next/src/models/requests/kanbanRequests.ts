@@ -28,7 +28,7 @@ export type AddKanbanColumnRequest = {
     order: number;
 }
 
-type ReplaceKanbanColumnRequest = {
+export type ReplaceKanbanColumnRequest = {
     id: string;
     columnToReplaceId: string;
 }

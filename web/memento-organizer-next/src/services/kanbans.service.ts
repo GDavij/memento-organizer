@@ -1,6 +1,6 @@
 import axios from '@/lib/axios.setup'
 import { Kanban, KanbanTask } from '@/models/data/kanban';
-import { updateKanbanTasksRequest } from '@/models/requests/kanbanRequests';
+import { UpdateKanbanColumnsRequest, updateKanbanTasksRequest } from '@/models/requests/kanbanRequests';
 
 async function getKanbanById(id: string): Promise<Kanban> {
     return (await axios.get(`/kanbans/find/${id}`)).data;
@@ -19,10 +19,21 @@ async function updateKanbanTasks(id: string, updateRequest: updateKanbanTasksReq
 
 }
 
+async function updateKanbanColumns(id: string, updateRequest: UpdateKanbanColumnsRequest): Promise<boolean> {
+    return (await axios.put(`/kanbans/update/${id}/columns`, updateRequest)).data;
+}
+
 async function getKanbansByOwner(): Promise<Kanban[]> {
     return (await axios.get("/kanbans/find")).data;
 }
 
-const services = { getKanbanById, getKanbanTasksById, getKanbanTaskById, getKanbansByOwner, updateKanbanTasks }
+const services = {
+    getKanbanById,
+    getKanbanTasksById,
+    getKanbanTaskById,
+    getKanbansByOwner,
+    updateKanbanTasks,
+    updateKanbansColumns: updateKanbanColumns
+}
 
 export default services;
