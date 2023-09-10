@@ -104,6 +104,7 @@ public class KanbanService : IKanbanService
         if (kanban == null)
             throw new Exception("Could not find kanban");
 
+        kanban.Columns.Sort((columnA, columnB) => columnA.Order - columnB.Order);
         return await kanban.ToKanbanResponse(authenticatedUser, _securityService);
     }
 
