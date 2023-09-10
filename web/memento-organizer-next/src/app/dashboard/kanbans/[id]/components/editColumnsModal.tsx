@@ -28,7 +28,7 @@ export default function EditColumnsModal({
 	);
 
 	useEffect(() => {
-		if (kanbanColumns) {
+		if (kanbanColumns && kanbanColumns.length > 0) {
 			setColumnToReplace(kanbanColumns[0].id);
 			setColumnToDoReplace(kanbanColumns[0].id);
 		}
@@ -177,7 +177,11 @@ export default function EditColumnsModal({
 						</div>
 						<div className='lg:h-72 h-30 overflow-y-auto px-4'>
 							<div className='flex flex-col gap-3'>
-								{renderColumnPreview(kanbanColumns)}
+								{kanbanColumns && kanbanColumns.length > 0 ? (
+									renderColumnPreview(kanbanColumns)
+								) : (
+									<span>No Columns exists yet</span>
+								)}
 							</div>
 						</div>
 					</div>

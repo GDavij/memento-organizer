@@ -20,6 +20,8 @@ export default function CreateColumnModal({
 	refetchColumn,
 }: CreateColumnModal) {
 	const getHighestColumnOrder = (columns: KanbanColumn[]) => {
+		if (columns.length == 0) return 0;
+
 		let highestColumn = columns[0];
 		for (let i = 1; i < columns.length; i++) {
 			if (columns[i].order > highestColumn.order) {
