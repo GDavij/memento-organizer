@@ -10,6 +10,7 @@ import {
 	MdFormatBold,
 	MdFormatItalic,
 	MdFormatUnderlined,
+	MdOutlineSquare,
 } from 'react-icons/md';
 import kanbansService from '@/services/kanbans.service';
 import { toast } from 'react-toastify';
@@ -87,9 +88,9 @@ export default function EditTaskModal({
 
 		setIsUpdating(true);
 		toast.promise(updatePromise, {
-			success: `Created task \"${name}\" with success`,
-			error: `Could not create task \"${name}\"`,
-			pending: `Creating task \"${name}\"...`,
+			success: `Updated task \"${name}\" with success`,
+			error: `Could not update task \"${name}\"`,
+			pending: `Updating task \"${name}\"...`,
 		});
 		await updatePromise;
 
@@ -125,69 +126,86 @@ export default function EditTaskModal({
 			subject='Update Task'
 			lockCloseBtn={isUpdating}
 		>
-			<form
-				className='w-full flex flex-col gap-4'
-				onSubmit={(ev) => {
-					ev.preventDefault();
-					updateTask();
-				}}
-			>
-				<Input.Root>
-					<Input.Flat>
-						<span>Name*</span>
-						<Input.Control
-							autoFocus={true}
-							value={name}
-							onChange={(ev) => setName(ev.target.value)}
-						/>
-					</Input.Flat>
-				</Input.Root>
-				<label htmlFor={editorId} className='flex flex-col mt-2'>
-					<span className='ml-1'>Content</span>
-					<div className='border-slate-400 border  rounded-lg overflow-y-auto h-64 max-h-64 '>
-						<div className='sticky top-0  flex gap-4 w-fit mb-2 z-10 p-2 bg-gradient-to-b from-white to-transparent dark:from-slate-700'>
-							<IconButton.Flat
-								type='button'
-								active={isBold}
-								onClick={toggleIsBold}
-							>
-								<MdFormatBold />
-							</IconButton.Flat>
-							<IconButton.Flat
-								type='button'
-								active={isItalic}
-								onClick={toggleIsItalic}
-							>
-								<MdFormatItalic />
-							</IconButton.Flat>
-							<IconButton.Flat
-								type='button'
-								active={isUnderline}
-								onClick={toggleIsUnderline}
-							>
-								<MdFormatUnderlined />
-							</IconButton.Flat>
+			{!isFetching ? (
+				<form
+					className='w-full flex flex-col gap-4'
+					onSubmit={(ev) => {
+						ev.preventDefault();
+						updateTask();
+					}}
+				>
+					<Input.Root>
+						<Input.Flat>
+							<span>Name*</span>
+							<Input.Control
+								autoFocus={true}
+								value={name}
+								onChange={(ev) => setName(ev.target.value)}
+							/>
+						</Input.Flat>
+					</Input.Root>
+					<label htmlFor={editorId} className='flex flex-col mt-2'>
+						<span className='ml-1'>Content</span>
+						<div className='border-slate-400 border  rounded-lg overflow-y-auto h-64 max-h-64 '>
+							<div className='sticky top-0  flex gap-4 w-fit mb-2 z-10 p-2 bg-gradient-to-b from-white to-transparent dark:from-slate-700'>
+								<IconButton.Flat
+									type='button'
+									active={isBold}
+									onClick={toggleIsBold}
+								>
+									<MdFormatBold />
+								</IconButton.Flat>
+								<IconButton.Flat
+									type='button'
+									active={isItalic}
+									onClick={toggleIsItalic}
+								>
+									<MdFormatItalic />
+								</IconButton.Flat>
+								<IconButton.Flat
+									type='button'
+									active={isUnderline}
+									onClick={toggleIsUnderline}
+								>
+									<MdFormatUnderlined />
+								</IconButton.Flat>
+							</div>
+							<div className='w-full h-full px-2'>
+								{task ? (
+									<SimpleEditorScreen
+										initialNoteContent={JSON.parse(task!.content)}
+										saveNoteCallback={async () => {}}
+										editorId={editorId}
+									/>
+								) : (
+									'Loading...'
+								)}
+							</div>
 						</div>
-						<div className='w-full h-full px-2'>
-							{task ? (
-								<SimpleEditorScreen
-									initialNoteContent={JSON.parse(task!.content)}
-									saveNoteCallback={async () => {}}
-									editorId={editorId}
-								/>
-							) : (
-								'Loading...'
-							)}
-						</div>
-					</div>
-				</label>
+					</label>
 
-				<div className='flex justify-end'>
-					<div className='w-full md:w-1/2'>
-						<Button.Flat>Update Task</Button.Flat>
+					<div className='flex justify-end'>
+						<div className='w-full md:w-1/2'>
+							<Button.Flat disabled={isUpdating}>
+								{isUpdating ? (
+									<span className='flex justify-center items-center w-full h-full'>
+										<MdOutlineSquare className='w-fit h-fit text-2xl animate-spin' />
+									</span>
+								) : (
+									'Update Task'
+								)}
+							</Button.Flat>
+						</div>
 					</div>
-				</div>
-			</form>
+				</form>
+			) : (
+				<span className='flex gap-2 items-center'>
+					<span className='w-fit h-fit animate-spin '>
+						<MdOutlineSquare className='text-4xl' />
+					</span>
+					<span className='text-2xl'>Loading Task</span>
+				</span>
+			)}
 		</Modal>
 	);
 }

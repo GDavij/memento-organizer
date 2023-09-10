@@ -2,7 +2,7 @@
 import { Kanban, KanbanColumn, KanbanTask } from '@/models/data/kanban';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import kanbansService from '@/services/kanbans.service';
 import {
 	MdAdd,
@@ -17,6 +17,8 @@ import ViewTaskModal from './components/viewTaskModal';
 import * as Button from '@/components/form/button';
 import CreateColumnModal from './components/createColumnModal';
 import EditKanbanModal from './components/editKanbanModal';
+import ConfirmDialog from '@/components/ConfirmDialog';
+import EditColumnsModal from './components/editColumnsModal';
 
 export default function Kanban() {
 	const { id } = useParams();
@@ -40,6 +42,13 @@ export default function Kanban() {
 	const [openCreateColumnModal, setOpenCreateColumnModal] = useState(false);
 	const [openEditKanbanModal, setOpenEditKanbanModal] = useState(false);
 
+	const [openDeleteColumnDialog, setOpenDeleteColumnDialog] = useState(false);
+	const [columnToDelete, setColumnToDelete] = useState<KanbanColumn | null>(
+		null
+	);
+
+	const [openEditColumnsModal, setOpenEditColumnsModal] = useState(false);
+
 	async function fetchTasks() {
 		const auxTasks = await kanbansService.getKanbanTasksById(id);
 		setKanbanTasks(auxTasks);
@@ -48,6 +57,7 @@ export default function Kanban() {
 	async function fetchKanban() {
 		const auxKanbans = await kanbansService.getKanbanById(id);
 		setKanban(auxKanbans);
+		console.log(auxKanbans);
 		fetchTasks();
 	}
 
@@ -56,7 +66,20 @@ export default function Kanban() {
 		setKanban(auxKanbans);
 	}
 
-	async function handleTaskDropChange() {}
+	async function handleDeleteColumn() {
+		const deleteColumnPromise = kanbansService.updateKanbanColumns(id, {
+			add: [],
+			replace: [],
+			delete: [columnToDelete!.id],
+		});
+		toast.promise(deleteColumnPromise, {
+			pending: `Deleting column \"${columnToDelete!.name}\"`,
+		});
+
+		await deleteColumnPromise;
+		await refetchKanban();
+		return;
+	}
 
 	async function handleTaskColumnChange(columnId: string) {
 		setDraggingOverColumn(columnId);
@@ -125,7 +148,9 @@ export default function Kanban() {
 
 				<span className='flex gap-8'>
 					<div>
-						<Button.Flat>Adjust Columns</Button.Flat>
+						<Button.Flat onClick={() => setOpenEditColumnsModal(true)}>
+							Adjust Columns
+						</Button.Flat>
 					</div>
 					<div>
 						<Button.Flat onClick={() => setOpenCreateColumnModal(true)}>
@@ -161,7 +186,12 @@ export default function Kanban() {
 									>
 										<MdAdd />
 									</IconButton.Flat>
-									<IconButton.Danger>
+									<IconButton.Danger
+										onClick={() => {
+											setColumnToDelete(column);
+											setOpenDeleteColumnDialog(true);
+										}}
+									>
 										<MdDelete />
 									</IconButton.Danger>
 								</span>
@@ -235,6 +265,30 @@ export default function Kanban() {
 				open={openEditKanbanModal}
 				onClose={() => setOpenEditKanbanModal(false)}
 				kanbanId={id}
+				refetchKanban={refetchKanban}
+			/>
+			<ConfirmDialog
+				onClose={() => {
+					setOpenDeleteColumnDialog(false);
+					setColumnToDelete(null);
+				}}
+				open={openDeleteColumnDialog}
+				onOkay={async () => {
+					await handleDeleteColumn();
+				}}
+				question={`Are you Sure to delete column \"${columnToDelete?.name}\"`}
+				title='Delete Column'
+				declineButtonContent='No'
+				okayButtonContent='Yes'
+			/>
+			<EditColumnsModal
+				open={openEditColumnsModal}
+				onClose={() => {
+					setOpenEditColumnsModal(false);
+				}}
+				kanbanId={id}
+				kanbanColumns={kanban?.columns}
+				refetchColumns={refetchKanban}
 			/>
 			<ToastContainer />
 		</>

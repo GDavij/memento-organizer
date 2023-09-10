@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import KanbansService from '@/services/kanbans.service';
 import { toast } from 'react-toastify';
 import * as Button from '@/components/form/button';
+import { MdOutlineSquare } from 'react-icons/md';
 
 interface CreateColumnModal extends BaseModalProps {
 	kanbanId: string;
@@ -43,7 +44,7 @@ export default function CreateColumnModal({
 		}
 
 		setIsCreating(true);
-		const createColumnPromise = KanbansService.updateKanbansColumns(kanbanId, {
+		const createColumnPromise = KanbansService.updateKanbanColumns(kanbanId, {
 			add: [
 				{
 					name,
@@ -90,13 +91,22 @@ export default function CreateColumnModal({
 							/>
 						</Input.Flat>
 					</Input.Root>
-					<Button.Flat>Create Column</Button.Flat>
+					<Button.Flat disabled={isCreating}>
+						{' '}
+						{isCreating ? (
+							<span className='flex justify-center items-center w-full h-full'>
+								<MdOutlineSquare className='w-fit h-fit text-2xl animate-spin' />
+							</span>
+						) : (
+							'Create Column'
+						)}
+					</Button.Flat>
 				</form>
 				<div className='border border-slate-300 rounded-lg p-4'>
 					<div className='text-emerald-500 font-semibold mb-4'>
 						Kanban Columns Preview
 					</div>
-					<div className=' h-96 overflow-y-auto px-4 '>
+					<div className='lg:h-72 h-30 overflow-y-auto px-4 '>
 						{kanbanColumns && (
 							<div className='flex flex-col gap-2'>
 								<div className='w-full h-2 bg-gradient-to-b from-white dark:from-slate-700 to-transparent sticky top-0'></div>

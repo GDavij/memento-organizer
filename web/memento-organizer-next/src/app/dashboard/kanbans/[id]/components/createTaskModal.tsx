@@ -10,6 +10,7 @@ import {
 	MdFormatBold,
 	MdFormatItalic,
 	MdFormatUnderlined,
+	MdOutlineSquare,
 } from 'react-icons/md';
 import kanbansService from '@/services/kanbans.service';
 import { toast } from 'react-toastify';
@@ -148,6 +149,7 @@ export default function CreateTaskModal({
 						</div>
 						<div className='w-full h-full px-2'>
 							<SimpleEditorScreen
+								readOnly={isCreating}
 								initialNoteContent={[
 									{ type: 'paragraph', children: [{ text: '' }] },
 								]}
@@ -160,7 +162,15 @@ export default function CreateTaskModal({
 
 				<div className='flex justify-end'>
 					<div className='w-full md:w-1/2'>
-						<Button.Flat>Create Task</Button.Flat>
+						<Button.Flat disabled={isCreating}>
+							{isCreating ? (
+								<span className='flex justify-center items-center w-full h-full'>
+									<MdOutlineSquare className='w-fit h-fit text-2xl animate-spin' />
+								</span>
+							) : (
+								'Create Task'
+							)}
+						</Button.Flat>
 					</div>
 				</div>
 			</form>

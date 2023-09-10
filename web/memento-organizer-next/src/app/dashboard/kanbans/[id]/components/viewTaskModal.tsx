@@ -83,10 +83,16 @@ export default function ViewTaskModal({
 				}
 				optionsMenu={
 					<span className='flex gap-3'>
-						<IconButton.Danger onClick={() => setOpenDeleteTaskDialog(true)}>
+						<IconButton.Danger
+							disabled={isFetching}
+							onClick={() => setOpenDeleteTaskDialog(true)}
+						>
 							<MdDelete className='text-2xl' />
 						</IconButton.Danger>
-						<IconButton.Flat onClick={() => setOpenEditTaskModal(true)}>
+						<IconButton.Flat
+							disabled={isFetching}
+							onClick={() => setOpenEditTaskModal(true)}
+						>
 							<MdEdit className='text-2xl' />
 						</IconButton.Flat>
 					</span>

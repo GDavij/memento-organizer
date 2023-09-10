@@ -11,7 +11,7 @@ function Flat({ active = true, ...props }: ButtonPrimaryProps) {
 				active
 					? 'bg-emerald-500 text-white'
 					: 'bg-slate-300 text-slate-800 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-900  dark:bg-slate-800 dark:text-slate-700'
-			} p-1   text-sm sm:text-lg font-semibold rounded-lg hover:bg-emerald-600 transition-all duration-200`}
+			} p-1   text-sm sm:text-lg font-semibold rounded-lg hover:bg-emerald-600 transition-all duration-200 disabled:bg-slate-200 disabled:text-slate-800 disabled:dark:bg-slate-800 dark:disabled:text-slate-400`}
 		/>
 	);
 }

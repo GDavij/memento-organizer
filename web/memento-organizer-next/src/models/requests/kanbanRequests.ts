@@ -32,3 +32,9 @@ export type ReplaceKanbanColumnRequest = {
     id: string;
     columnToReplaceId: string;
 }
+
+
+export type UpdateKanbanRequest = {
+    name?: string
+    description?: string
+}
