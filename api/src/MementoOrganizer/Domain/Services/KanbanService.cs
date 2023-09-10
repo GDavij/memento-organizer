@@ -223,10 +223,12 @@ public class KanbanService : IKanbanService
         
         foreach (var columnToDelete in updateKanbanColumnsRequest.Delete!)
         {
-            var existsAt = kanban.Columns.FindIndex(column => column.Id == _mongoIdentityProvider.ParseIdFromString(columnToDelete));
+            ObjectId objectIdColumnToDelete = _mongoIdentityProvider.ParseIdFromString(columnToDelete);
+            var existsAt = kanban.Columns.FindIndex(column => column.Id == objectIdColumnToDelete);
             if (existsAt != -1)
             {
                 kanban.Columns.RemoveAt(existsAt);
+                kanban.Tasks.RemoveAll(task => task.Column == objectIdColumnToDelete);
             }
             else
             {
