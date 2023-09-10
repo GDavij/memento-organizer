@@ -31,6 +31,10 @@ async function getKanbansByOwner(): Promise<Kanban[]> {
     return (await axios.get("/kanbans/find")).data;
 }
 
+async function deleteKanbanById(id: string) {
+    await axios.delete(`/kanbans/delete/${id}`)
+}
+
 const services = {
     getKanbanById,
     getKanbanTasksById,
@@ -38,7 +42,8 @@ const services = {
     getKanbansByOwner,
     updateKanbanTasks,
     updateKanban,
-    updateKanbanColumns
+    updateKanbanColumns,
+    deleteKanbanById
 }
 
 export default services;
