@@ -94,12 +94,6 @@ export default function EditColumnsModal({
 	};
 
 	const updateColumnFormId = useId();
-	useEffect(() => {
-		console.log({
-			columnToDoReplace: columnToMoveTo,
-			columnToReplace: columnToSwap,
-		});
-	}, [columnToMoveTo, columnToSwap]);
 
 	async function updateColumns() {
 		if (!columnToSwap || !columnToMoveTo) {

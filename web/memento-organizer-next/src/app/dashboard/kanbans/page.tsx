@@ -29,7 +29,6 @@ export default function Kanbans() {
 			success: 'Fetched notes with success',
 		});
 		const aux = await kanbans;
-		console.log(aux);
 		setKanbans(aux);
 		setIsFetching(false);
 	}

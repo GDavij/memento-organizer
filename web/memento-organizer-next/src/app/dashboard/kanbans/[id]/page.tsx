@@ -57,7 +57,6 @@ export default function Kanban() {
 	async function fetchKanban() {
 		const auxKanbans = await kanbansService.getKanbanById(id);
 		setKanban(auxKanbans);
-		console.log(auxKanbans);
 		fetchTasks();
 	}
 
@@ -88,9 +87,6 @@ export default function Kanban() {
 		tasks[taskToHandleIndex].column = columnId;
 		tasks[taskToHandleIndex].lastUpdate = new Date().toISOString();
 		setKanbanTasks(tasks);
-		// On Drag End Event, Fix
-
-		console.log({ draggingTask, draggingOverColumn });
 
 		if (updateAbortController != null) {
 			updateAbortController.abort();
@@ -101,8 +97,6 @@ export default function Kanban() {
 			'drop',
 			async (ev) => {
 				ev.preventDefault();
-				console.log('Start Updating');
-				console.log({ columnId, draggingTask });
 				await kanbansService.updateKanbanTasks(id, {
 					add: [],
 					delete: [],
@@ -113,7 +107,6 @@ export default function Kanban() {
 						},
 					],
 				});
-				console.log('End Updating');
 				setDraggingTask(null);
 				setDraggingOverColumn(null);
 				controller.abort();
@@ -125,9 +118,7 @@ export default function Kanban() {
 		setUpdateAbortController(controller);
 	}
 
-	useEffect(() => {
-		console.log(draggingOverColumn);
-	}, [draggingOverColumn]);
+	useEffect(() => {}, [draggingOverColumn]);
 
 	useEffect(() => {
 		fetchKanban();
