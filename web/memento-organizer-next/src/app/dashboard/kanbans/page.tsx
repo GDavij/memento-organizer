@@ -38,16 +38,24 @@ export default function Kanbans() {
 	function filterKanbans(kanbans: Kanban[]) {
 		switch (filterBy) {
 			case EFilterBy.Name:
-				return kanbans.filter((kanban) => kanban.name.includes(filter));
+				return kanbans.filter((kanban) =>
+					kanban.name.toLowerCase().includes(filter.toLowerCase())
+				);
 
 			case EFilterBy.Issued:
 				return kanbans.filter((kanban) =>
-					new Date(kanban.issued).toDateString().includes(filter)
+					new Date(kanban.issued)
+						.toDateString()
+						.toLowerCase()
+						.includes(filter.toLowerCase())
 				);
 
 			case EFilterBy.LastUpdate:
 				return kanbans.filter((kanban) =>
-					new Date(kanban.issued).toDateString().includes(filter)
+					new Date(kanban.issued)
+						.toDateString()
+						.toLowerCase()
+						.includes(filter.toLowerCase())
 				);
 		}
 	}

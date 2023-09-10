@@ -50,7 +50,7 @@ export default function EditColumnsModal({
 				return (
 					<div
 						key={column.id}
-						className='h-10 flex items-center gap-3 bg-slate-200 px-4 py-2 rounded-sm'
+						className='h-10 flex items-center gap-3 bg-slate-200 dark:bg-slate-600  px-4 py-2 rounded-sm'
 					>
 						<div className='w-1 h-4 rounded-lg bg-emerald-500 flex flex-grow-0 flex-shrink-0' />
 						<span className='truncate whitespace-nowrap flex-grow-0 flex-shrink'>
@@ -65,7 +65,7 @@ export default function EditColumnsModal({
 				return (
 					<div
 						key={column.id}
-						className='flex items-center gap-3 bg-slate-200 px-4 py-2 rounded-sm flex-grow-0 flex-shrink-0'
+						className='flex items-center gap-3 bg-slate-200 dark:bg-slate-600 px-4 py-2 rounded-sm flex-grow-0 flex-shrink-0'
 					>
 						<div className='w-1 h-4 rounded-lg bg-emerald-500 flex flex-grow-0 flex-shrink-0' />
 						<span className='truncate whitespace-nowrap flex-grow-0 flex-shrink'>
@@ -80,7 +80,7 @@ export default function EditColumnsModal({
 			return (
 				<div
 					key={column.id}
-					className='h-10 flex items-center gap-3 bg-slate-200 px-4 py-2 rounded-sm'
+					className='h-10 flex items-center gap-3 bg-slate-200 dark:bg-slate-600 px-4 py-2 rounded-sm'
 				>
 					<div className='w-1 h-4 rounded-lg bg-emerald-500 flex flex-grow-0 flex-shrink-0' />
 					<span className='truncate whitespace-nowrap flex-grow-0 flex-shrink'>
@@ -176,6 +176,7 @@ export default function EditColumnsModal({
 							Preview Columns
 						</div>
 						<div className='lg:h-72 h-30 overflow-y-auto px-4'>
+							<div className='w-full h-2 bg-gradient-to-b from-white dark:from-slate-700 to-transparent sticky top-0'></div>
 							<div className='flex flex-col gap-3'>
 								{kanbanColumns && kanbanColumns.length > 0 ? (
 									renderColumnPreview(kanbanColumns)
