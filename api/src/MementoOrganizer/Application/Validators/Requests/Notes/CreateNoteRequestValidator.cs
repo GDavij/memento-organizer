@@ -7,6 +7,6 @@ public class CreateNoteRequestValidator : AbstractValidator<CreateNoteRequest>
     public CreateNoteRequestValidator()
     {
         RuleFor(req => req.Name)
-        .NotEmpty().WithMessage("Name Must be Send");
+            .NotEmpty().WithMessage("Name Must be Send");
     }
 }

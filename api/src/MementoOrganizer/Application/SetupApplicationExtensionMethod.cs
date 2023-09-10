@@ -22,6 +22,8 @@ using Amazon.S3.Model;
 using System.IO;
 using System;
 using Microsoft.AspNetCore.Hosting;
+using MementoOrganizer.Domain.Models.Requests.Kanbans;
+using MementoOrganizer.Application.Validators.Requests.Kanbans;
 
 namespace MementoOrganizer.Application;
 
@@ -33,6 +35,7 @@ public static class SetupApplicationExtensionMethod
             .AddScoped<IDatabaseConnection<IMongoDatabase>, MongoDatabaseConnection>()
             .AddScoped<IUsersRepository<ObjectId>, MongoUsersRepository>()
             .AddScoped<INotesRepository<ObjectId>, MongoNotesRepository>()
+            .AddScoped<IKanbansRepository<ObjectId>, MongoKanbansRepository>()
             .AddSingleton<IIdentityProvider<ObjectId>, MongoIdentityProvider>()
             .AddScoped<IStorageConnection<AmazonS3Client>, AmazonS3StorageConnection>()
             .AddScoped<IStorageRepository<GetObjectResponse>, S3ImageRepository>();
@@ -46,6 +49,7 @@ public static class SetupApplicationExtensionMethod
             .AddScoped<ISecurityService, SecurityService>()
             .AddScoped<IUserService, UserService>()
             .AddScoped<INoteService, NoteService>()
+            .AddScoped<IKanbanService, KanbanService>()// Coupled Service, Something to fix
             .AddScoped<IStorageService, S3ImageStorageService>();
 
         return services;
@@ -62,6 +66,9 @@ public static class SetupApplicationExtensionMethod
             .AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>()
             .AddScoped<IValidator<CreateNoteRequest>, CreateNoteRequestValidator>()
             .AddScoped<IValidator<UpdateTargetUserRequest>, UpdateTargetUserRequestValidator>()
+            .AddScoped<IValidator<CreateKanbanRequest>, CreateKanbanRequestValidator>()
+            .AddScoped<IValidator<UpdateKanbanColumnsRequest>, UpdateKanbanColumnsRequestValidator>()
+            .AddScoped<IValidator<UpdateKanbanTasksRequest>, UpdateKanbanTasksRequestValidator>()
             .AddFluentValidationAutoValidation();
 
         return services;
@@ -93,6 +100,6 @@ public static class SetupApplicationExtensionMethod
                 Environment.SetEnvironmentVariable(parts[0], parts[1]);
             }
         }
-        
+
     }
 }

@@ -48,18 +48,18 @@ public class NoteService : INoteService
 
         DateTime issued = DateTime.UtcNow;
         var description = createNoteRequest.Description ?? "";
-        var content = "[{\"type\":\"paragraph\",\"children\":[{\"text\": \"\"}]}]";
-        string encriptedName = (await _securityService.EncriptData(createNoteRequest.Name!, authenticatedUser.EncryptionKey, issued.ToString())).ToBase64String();
-        string encriptedDescription = (await _securityService.EncriptData(description, authenticatedUser.EncryptionKey, issued.ToString())).ToBase64String();
-        string encriptedContent = (await _securityService.EncriptData(content, authenticatedUser.EncryptionKey, issued.ToString())).ToBase64String();
+        const string content = "[{\"type\":\"paragraph\",\"children\":[{\"text\": \"\"}]}]";
+        string encryptedName = (await _securityService.EncriptData(createNoteRequest.Name!, authenticatedUser.EncryptionKey, issued.ToString())).ToBase64String();
+        string encryptedDescription = (await _securityService.EncriptData(description, authenticatedUser.EncryptionKey, issued.ToString())).ToBase64String();
+        string encryptedContent = (await _securityService.EncriptData(content, authenticatedUser.EncryptionKey, issued.ToString())).ToBase64String();
 
 
         Note<ObjectId> note = new(
             _mongoIdentityProvider,
             authenticatedUser.Id,
-            encriptedName,
-            encriptedDescription,
-            encriptedContent,
+            encryptedName,
+            encryptedDescription,
+            encryptedContent,
             issued
             );
 
