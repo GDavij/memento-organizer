@@ -47,7 +47,7 @@ public class MongoKanbansRepository : IKanbansRepository<ObjectId>
     public async Task<List<Kanban<ObjectId>>> FindKanbansByOwner(ObjectId ownerId)
     {
         var filter = Builders<Kanban<ObjectId>>.Filter.Eq(kanban => kanban.Owner, ownerId);
-        return await _kanbansCollection.Find(filter).ToListAsync();
+        return await _kanbansCollection.Find(filter).SortByDescending(k => k.LastUpdate).ToListAsync();
     }
 
     public async Task<List<KanbanTask<ObjectId>>?> FindKanbanTasksByKanbanId(ObjectId id, ObjectId ownerId)
