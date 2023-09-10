@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace MementoOrganizer.Domain.Extensions;
 
-public static class ConvertionExtensions
+public static class NotesConvertionExtensions
 {
-    public async static Task<NoteResponse> ToNoteResponse<TId>(this Note<TId> note, User<TId> user, ISecurityService securityService)
+    public static async Task<NoteResponse> ToNoteResponse<TId>(this Note<TId> note, User<TId> user, ISecurityService securityService)
     {
 
         Task<string> nameTask = securityService.DecriptData(note.Name.FromBase64String(), user.EncryptionKey, note.Issued.ToString());
@@ -35,9 +35,9 @@ public static class ConvertionExtensions
     {
         var noteResponsesTasks = notes.Select(note => note.ToNoteResponse(user, securityService));
         List<NoteResponse> noteResponses = new List<NoteResponse>();
-        foreach (Task<NoteResponse> note in noteResponsesTasks)
+        foreach (Task<NoteResponse> noteTask in noteResponsesTasks)
         {
-            noteResponses.Add(await note);
+            noteResponses.Add(await noteTask);
         }
 
         return noteResponses;
