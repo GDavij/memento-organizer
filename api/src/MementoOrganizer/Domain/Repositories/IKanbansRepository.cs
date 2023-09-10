@@ -13,7 +13,6 @@ public interface IKanbansRepository<TId>
     Task<KanbanTask<TId>?> FindKanbanTaskById(TId id, TId ownerId);
     Task<bool> ReplaceKanbanById(TId id, TId ownerId, Kanban<TId> kanban);
     //? Maybe Create a Method for Adding and Removing Tasks instead of Full Overwrite but still keeping Tasks show Order
-    Task<bool> ReplaceKanbanTasksById(TId id, TId ownerId, List<KanbanTask<TId>> tasks);
     Task<bool> DeleteKanbanById(TId id, TId ownerId);
     Task<bool> DeleteKanbansByOwner(TId ownerId);
 }

@@ -98,18 +98,4 @@ public class MongoKanbansRepository : IKanbansRepository<ObjectId>
         await query;
         return query.IsCompletedSuccessfully;
     }
-
-    public async Task<bool> ReplaceKanbanTasksById(ObjectId id, ObjectId ownerId, List<KanbanTask<ObjectId>> tasks)
-    {
-        var filterBuilder = Builders<Kanban<ObjectId>>.Filter;
-        var filter = filterBuilder.Eq(kanban => kanban.Id, id) & filterBuilder.Eq(kanban => kanban.Owner, ownerId);
-        var update = Builders<Kanban<ObjectId>>.Update.Set(kanban => kanban.Tasks, tasks);
-
-        var query = _kanbansCollection.UpdateOneAsync(filter, update);
-        await query;
-        return query.IsCompletedSuccessfully;
-    }
-
-
-
 }

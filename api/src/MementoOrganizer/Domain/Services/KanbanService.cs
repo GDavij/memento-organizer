@@ -193,6 +193,8 @@ public class KanbanService : IKanbanService
                 authenticatedUser.Issued.ToString("O")
             )).ToBase64String();
         }
+        
+        kanban.LastUpdate = DateTime.UtcNow;
 
         bool hasBeenUpdated = await _mongoKanbansRepository.ReplaceKanbanById(kanban.Id, authenticatedUser.Id, kanban);
         return hasBeenUpdated;
@@ -217,6 +219,8 @@ public class KanbanService : IKanbanService
         if (kanban == null)
             throw new Exception("Could not find kanban");
 
+        DateTime lastUpdate = DateTime.UtcNow;
+        
         foreach (var columnToDelete in updateKanbanColumnsRequest.Delete!)
         {
             var existsAt = kanban.Columns.FindIndex(column => column.Id == _mongoIdentityProvider.ParseIdFromString(columnToDelete));
@@ -239,6 +243,9 @@ public class KanbanService : IKanbanService
                 var columnToTruncateOrder = kanban.Columns[existsColumnToReplaceAt].Order;
                 kanban.Columns[existsColumnToReplaceAt].Order = kanban.Columns[existsColumnAt].Order;
                 kanban.Columns[existsColumnAt].Order = columnToTruncateOrder;
+                
+                kanban.Columns[existsColumnToReplaceAt].LastUpdate = lastUpdate;
+                kanban.Columns[existsColumnAt].LastUpdate = lastUpdate;
             }
             else
             {
@@ -274,6 +281,7 @@ public class KanbanService : IKanbanService
             }
         }
 
+        kanban.LastUpdate = lastUpdate;
         var hasBeenUpdated = await _mongoKanbansRepository.ReplaceKanbanById(kanban.Id, authenticatedUser.Id, kanban);
         return hasBeenUpdated;
     }
@@ -296,6 +304,8 @@ public class KanbanService : IKanbanService
         if (kanban == null)
             throw new Exception("Could not find kanban");
 
+        DateTime lastUpdate = DateTime.UtcNow;
+        
         foreach (var taskToReplace in updateKanbanTasksRequest.Replace!)
         {
             var existsIndex = kanban.Tasks.FindIndex(task => task.Id == _mongoIdentityProvider.ParseIdFromString(taskToReplace.Id!));
@@ -332,7 +342,8 @@ public class KanbanService : IKanbanService
 
                     kanban.Tasks[existsIndex].Content = encryptedContent;
                 }
-
+                
+                kanban.Tasks[existsIndex].LastUpdate = DateTime.UtcNow;
             }
             else
             {
@@ -388,9 +399,9 @@ public class KanbanService : IKanbanService
             }
         }
 
-        var hasBeenUpdated = await _mongoKanbansRepository
-                .ReplaceKanbanTasksById(kanban.Id, authenticatedUser.Id, kanban.Tasks);
-
+        kanban.LastUpdate = lastUpdate;
+        var hasBeenUpdated = await _mongoKanbansRepository.ReplaceKanbanById(kanban.Id, authenticatedUser.Id, kanban);
+        
         return hasBeenUpdated;
     }
 }
