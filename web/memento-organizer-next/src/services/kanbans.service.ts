@@ -1,6 +1,6 @@
 import axios from '@/lib/axios.setup'
 import { Kanban, KanbanTask } from '@/models/data/kanban';
-import { UpdateKanbanColumnsRequest, UpdateKanbanRequest, updateKanbanTasksRequest } from '@/models/requests/kanbanRequests';
+import { CreateKanbanRequest, UpdateKanbanColumnsRequest, UpdateKanbanRequest, updateKanbanTasksRequest } from '@/models/requests/kanbanRequests';
 
 async function getKanbanById(id: string): Promise<Kanban> {
     return (await axios.get(`/kanbans/find/${id}`)).data;
@@ -23,7 +23,7 @@ async function updateKanbanColumns(id: string, updateRequest: UpdateKanbanColumn
     return (await axios.put(`/kanbans/update/${id}/columns`, updateRequest)).data;
 }
 
-async function updateKanban(id: string, updateKanbanRequest: UpdateKanbanRequest) {
+async function updateKanban(id: string, updateKanbanRequest: UpdateKanbanRequest): Promise<boolean> {
     return (await axios.put(`/kanbans/update/${id}`, updateKanbanRequest)).data;
 }
 
@@ -31,8 +31,12 @@ async function getKanbansByOwner(): Promise<Kanban[]> {
     return (await axios.get("/kanbans/find")).data;
 }
 
-async function deleteKanbanById(id: string) {
-    await axios.delete(`/kanbans/delete/${id}`)
+async function deleteKanbanById(id: string): Promise<boolean> {
+    return (await axios.delete(`/kanbans/delete/${id}`)).data
+}
+
+async function createKanban(createKanbanRequest: CreateKanbanRequest): Promise<string> {
+    return (await axios.post<{ id: string }>(`/kanbans/new`, createKanbanRequest)).data.id;
 }
 
 const services = {
@@ -43,7 +47,8 @@ const services = {
     updateKanbanTasks,
     updateKanban,
     updateKanbanColumns,
-    deleteKanbanById
+    deleteKanbanById,
+    createKanban
 }
 
 export default services;

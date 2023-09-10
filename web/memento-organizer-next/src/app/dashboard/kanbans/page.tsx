@@ -1,6 +1,8 @@
 'use client';
 
 import * as Input from '@/components/form/input';
+import * as Select from '@/components/form/select';
+
 import {
 	MdLockClock,
 	MdOutlineTableChart,
@@ -16,10 +18,40 @@ import { ToastContainer, toast } from 'react-toastify';
 import { Kanban } from '@/models/data/kanban';
 import KanbansService from '@/services/kanbans.service';
 import Link from 'next/link';
+import { CreateKanbanModal } from './components/createKanbanModal';
+
+enum EFilterBy {
+	Name = 'Name',
+	Issued = 'Issued',
+	LastUpdate = 'Last Update',
+}
 export default function Kanbans() {
 	const [isFetching, setIsFetching] = useState(false);
-
 	const [kanbans, setKanbans] = useState<Kanban[]>([]);
+	const [filteredKanbans, setFilteredKanbans] = useState<Kanban[]>([]);
+
+	const [filterBy, setFilterBy] = useState<EFilterBy>(EFilterBy.Name);
+	const [filter, setFilter] = useState<string>('');
+
+	const [openCreateKanbanModal, setOpenCreateKanbanModal] = useState(false);
+
+	function filterKanbans(kanbans: Kanban[]) {
+		switch (filterBy) {
+			case EFilterBy.Name:
+				return kanbans.filter((kanban) => kanban.name.includes(filter));
+
+			case EFilterBy.Issued:
+				return kanbans.filter((kanban) =>
+					new Date(kanban.issued).toDateString().includes(filter)
+				);
+
+			case EFilterBy.LastUpdate:
+				return kanbans.filter((kanban) =>
+					new Date(kanban.issued).toDateString().includes(filter)
+				);
+		}
+	}
+
 	async function fetchKanbans() {
 		setIsFetching(true);
 		const kanbans = KanbansService.getKanbansByOwner();
@@ -30,6 +62,7 @@ export default function Kanbans() {
 		});
 		const aux = await kanbans;
 		setKanbans(aux);
+		setFilteredKanbans(filterKanbans(aux));
 		setIsFetching(false);
 	}
 
@@ -37,22 +70,47 @@ export default function Kanbans() {
 		fetchKanbans();
 	}, []);
 
+	useEffect(() => {
+		setFilteredKanbans(filterKanbans(kanbans));
+	}, [filter, filterBy]);
+
 	return (
 		<>
-			<div className='w-full h-18 bg-white dark:bg-slate-700 drop-shadow-md flex items-center px-3 py-2 md:px-6 md:py-4 justify-between rounded-lg sticky top-0 z-10'>
+			<div className='w-full h-18 bg-white dark:bg-slate-700 drop-shadow-md flex items-center px-3 py-2 md:px-6 md:py-4 center md:justify-between rounded-lg sticky top-0 z-10'>
 				<div>
-					<div className='justify-start sm:flex hidden'>
+					<div className='justify-start gap-2 lg:flex hidden mr-4'>
+						<div className='w-fit'>
+							<Select.Root>
+								<Select.Flat>
+									<span className='ml-2 cursor-default'>Filter By:</span>
+									<Select.Control
+										value={filterBy}
+										onChange={(ev) => setFilterBy(ev.target.value as EFilterBy)}
+									>
+										<option value='Name'>Name</option>
+										<option value='Issued'>Issued</option>
+										<option value='Last Update'>LastUpdate</option>
+									</Select.Control>
+								</Select.Flat>
+							</Select.Root>
+						</div>
 						<Input.Root>
 							<Input.Flat>
-								<Input.Control placeholder='Filter Your Kanbans By Name...' />
+								<Input.Control
+									placeholder={`Filter Your Kanbans By ${filterBy}...`}
+									value={filter}
+									onChange={(ev) => setFilter(ev.target.value)}
+								/>
 							</Input.Flat>
 						</Input.Root>
 					</div>
 				</div>
-				<div>
+				<div className='flex gap-8 lg:w-fit  w-full'>
 					<Button.Flat disabled={isFetching} onClick={() => fetchKanbans()}>
 						<span className='flex gap-2 items-center justify-center'>
-							<span className='sm:text-sm w-fit h-fit'>Refresh Kanbans</span>
+							<span className='flex items-center whitespace-nowrap'>
+								Refresh Kanbans
+							</span>
 							<span
 								className={`inline-block  ${
 									isFetching && 'animate-spin'
@@ -62,10 +120,15 @@ export default function Kanbans() {
 							</span>
 						</span>
 					</Button.Flat>
+					<Button.Flat onClick={() => setOpenCreateKanbanModal(true)}>
+						<span className='flex items-center justify-center'>
+							<span>Create Kanban</span>
+						</span>
+					</Button.Flat>
 				</div>
 			</div>
 			<div className='mt-8 mb-4 w-full min-h-[80%] bg-white dark:bg-slate-700  drop-shadow-lg rounded-md grid grid-cols-1   lg:grid-cols-2 xl:grid-cols-3 flex-grow flex-shrink-0'>
-				{kanbans.map((kanban) => (
+				{filteredKanbans.map((kanban) => (
 					<Link
 						href={`/dashboard/kanbans/${kanban.id}`}
 						key={kanban.id}
@@ -106,6 +169,10 @@ export default function Kanbans() {
 					</Link>
 				))}
 			</div>
+			<CreateKanbanModal
+				open={openCreateKanbanModal}
+				onClose={() => setOpenCreateKanbanModal(false)}
+			/>
 			<ToastContainer />
 		</>
 	);
