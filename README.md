@@ -44,14 +44,14 @@ In This actual state we already have those functionalities
 - Basic Account Manager(Create Account, update password, e-mail, delete account)
 - Basic Login Screen (Email, Password)
 - Basic Admin Dashboard
+- Capability to create and modify kanbans
+  - Table
+  - Columns
+  - Tasks
 
 ### Missing
 
 > keep in mind that the features missing that are here listed are all for the actual moment of the project it can change depending of the path this project will take.
-
-- Kanban
-
-  - Manage your tasks with a Kanban
 
 - Though Sets
 
