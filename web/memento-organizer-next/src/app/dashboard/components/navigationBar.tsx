@@ -1,23 +1,20 @@
 'use client';
+
 import {
 	MdHome,
 	MdArticle,
 	MdAccountBox,
 	MdExitToApp,
 	MdSupervisedUserCircle,
-	MdAdminPanelSettings,
 	MdEngineering,
-	MdTableView,
 	MdViewKanban,
 } from 'react-icons/md';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useSidebar } from '../contexts/useSidebar';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useAuthentication } from '@/context/useAuthenticationContext';
-import usersService from '@/services/user.service';
-import { toast } from 'react-toastify';
 enum EUserRole {
 	Admin = 'admin',
 	User = 'user',
