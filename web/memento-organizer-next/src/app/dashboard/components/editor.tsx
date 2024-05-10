@@ -1,23 +1,17 @@
 'use client';
 import {
 	Editable,
-	RenderElementProps,
-	RenderLeafProps,
 	Slate,
 	withReact,
 } from 'slate-react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
 	Transforms,
 	createEditor,
 	Descendant,
-	Editor,
-	node,
-	Path,
-	Location,
 } from 'slate';
 
-import { HistoryEditor, withHistory } from 'slate-history';
+import { withHistory } from 'slate-history';
 import isHotkey from 'is-hotkey';
 import {
 	countOrderedListN,
@@ -32,9 +26,6 @@ import {
 	withImagesFromFiles,
 	withMarkdown,
 } from '@/lib/editor/editorExtensions.setup';
-import { useImageStorageCacheContext } from '../contexts/useImageStorageCacheContext';
-import s3ImageStorageService from '@/services/s3ImageStorage.service';
-import { toast } from 'react-toastify';
 
 type TEditorScreenProps = {
 	initialNoteContent: Descendant[];
@@ -59,8 +50,6 @@ export function EditorScreen({
 		setIsUnderline,
 		noteType,
 		setNoteType,
-		isImageLoading,
-		setIsImageLoading,
 	} = useEditor();
 
 	const editor = useMemo(
@@ -82,9 +71,6 @@ export function EditorScreen({
 	) : (
 		<Slate
 			onChange={(value) => {
-				//? Maybe this is not the best implementation of this.
-				// But till now it lead to several performance improvement
-				// This improvement is probaly because of less eventHandlers to work on this component
 				const isBoldMark = isMarkActive(editor, 'bold');
 				const isItalicMark = isMarkActive(editor, 'italic');
 				const isUnderlineMark = isMarkActive(editor, 'underline');
