@@ -1,8 +1,6 @@
 import Modal, { BaseModalProps } from '@/components/Modal';
 import { KanbanTask } from '@/models/data/kanban';
-import * as Input from '@/components/form/input';
 import * as IconButton from '@/components/form/iconButton';
-
 import { SimpleEditorScreen } from '@/app/dashboard/components/simpleEditor';
 import { useEffect, useState } from 'react';
 import kanbansService from '@/services/kanbans.service';

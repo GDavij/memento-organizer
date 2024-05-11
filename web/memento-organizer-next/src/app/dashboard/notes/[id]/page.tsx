@@ -1,60 +1,20 @@
 'use client';
 import { TUpdateNoteRequest } from '@/models/requests/noteRequests';
 import {
-	MdAssignmentAdd,
-	MdAutorenew,
-	MdBuild,
-	MdDelete,
-	MdFormatAlignCenter,
-	MdFormatAlignJustify,
-	MdFormatAlignLeft,
-	MdFormatAlignRight,
 	MdFormatBold,
 	MdFormatItalic,
 	MdFormatUnderlined,
 	MdOutlineFormatListBulleted,
 	MdOutlineFormatListNumbered,
 	MdOutlineSquare,
-	MdSettings,
-	MdVisibility,
 } from 'react-icons/md';
-import isHotkey from 'is-hotkey';
 import EditNoteModal from './components/EditNoteModal';
-
-import Image from 'next/image';
-import {
-	LegacyRef,
-	Ref,
-	useCallback,
-	useEffect,
-	useId,
-	useMemo,
-	useRef,
-	useState,
-} from 'react';
-import { HistoryEditor, withHistory } from 'slate-history';
+import { useEffect, useId, useState } from 'react';
 import notesService from '@/services/notes.service';
-import { useForm } from 'react-hook-form';
 import { usePathname } from 'next/navigation';
 import { toast, ToastContainer } from 'react-toastify';
 import Loader from '@/components/Loader';
-import {
-	Descendant,
-	Editor,
-	Location,
-	NodeEntry,
-	Transforms,
-	createEditor,
-	insertNode,
-} from 'slate';
-import {
-	Editable,
-	RenderElementProps,
-	RenderLeafProps,
-	Slate,
-	withReact,
-} from 'slate-react';
-import { ReactEditor } from 'slate-react';
+import { Descendant, Transforms } from 'slate';
 import { useTopBar } from '../../contexts/useTopBar';
 import { Note, TBaseNoteData, TNoteTypes } from '@/models/data/editorTypes';
 import { useEditor } from '../../contexts/editor/useEditor';
