@@ -9,7 +9,6 @@ import {
 	MdDelete,
 	MdOutlineTableChart,
 	MdOutlineTune,
-	MdRemove,
 } from 'react-icons/md';
 import * as IconButton from '@/components/form/iconButton';
 import CreateTaskModal from './components/createTaskModal';
@@ -20,8 +19,8 @@ import EditKanbanModal from './components/editKanbanModal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import EditColumnsModal from './components/editColumnsModal';
 
-export default function Kanban() {
-	const { id } = useParams();
+export default function KanbanPage() {
+	const { id } = useParams() as { id: string };
 
 	const [kanban, setKanban] = useState<Kanban | null>(null);
 	const [kanbanTasks, setKanbanTasks] = useState<KanbanTask[]>([]);

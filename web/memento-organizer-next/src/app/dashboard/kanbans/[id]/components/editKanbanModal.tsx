@@ -5,7 +5,7 @@ import kanbansService from '@/services/kanbans.service';
 import * as Input from '@/components/form/input';
 import * as Button from '@/components/form/button';
 import { toast } from 'react-toastify';
-import { MdDelete, MdOutlineSquare, MdSquare } from 'react-icons/md';
+import { MdDelete, MdOutlineSquare } from 'react-icons/md';
 import * as IconButton from '@/components/form/iconButton';
 import { useRouter } from 'next/navigation';
 import ConfirmDialog from '@/components/ConfirmDialog';
